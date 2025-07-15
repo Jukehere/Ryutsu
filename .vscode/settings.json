@@ -1,0 +1,6 @@
+{
+  "editor.formatOnSave": true,  // Auto-format code when saving
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "eslint.validate": ["javascript", "javascriptreact", "typescript"]
+}
