@@ -1,11 +1,33 @@
 {
   "name": "ryutsu",
-  "version": "0.1",
+  "productName": "Ryutsu",
+  "author": "Juke",
+  "description": "Find your way while shopping in ffxiv with Ryutsu.",
+  "version": "0.2.0",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron ."
+   "start": "electron .",
+   "build": "electron-builder"
   },
   "devDependencies": {
-    "electron": "^37.2.1"
+    "electron": "^37.2.1",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.juke.ryutsu",
+    "productName": "Ryutsu",
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "sign": false
+    }
   }
 }

@@ -14,9 +14,7 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
-  mainWindow.webContents.openDevTools();
 
-  // Optional debugger
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.debugger.attach('1.1');
   });
