@@ -9,6 +9,58 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <style>
+      .lists-btn-prominent {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #6366f1;
+        color: #fff;
+        border: none;
+        font-size: 1.08rem;
+        font-weight: 600;
+        padding: 10px 18px 10px 16px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(99,102,241,0.08);
+        margin-right: 18px;
+        margin-left: 6px;
+        cursor: pointer;
+        transition: background 0.18s, box-shadow 0.18s, color 0.18s;
+        outline: none;
+        min-width: 0;
+      }
+      .lists-btn-prominent:hover, .lists-btn-prominent:focus {
+        background: #4f46e5;
+        color: #fff;
+        box-shadow: 0 4px 16px rgba(99,102,241,0.13);
+      }
+      .lists-btn-prominent i {
+        font-size: 1.25rem;
+      }
+      .lists-btn-label {
+        font-size: 1.08rem;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+      }
+      body.dark-mode .lists-btn-prominent {
+        background: #222;
+        color: #a5b4fc;
+        box-shadow: 0 2px 8px rgba(129,140,248,0.10);
+      }
+      body.dark-mode .lists-btn-prominent:hover, body.dark-mode .lists-btn-prominent:focus {
+        background: #4338ca;
+        color: #fff;
+        box-shadow: 0 4px 16px rgba(129,140,248,0.18);
+      }
+      @media (max-width: 768px) {
+        .lists-btn-prominent {
+          padding: 8px 12px 8px 10px;
+          font-size: 1rem;
+          margin-right: 8px;
+        }
+        .lists-btn-label {
+          display: none;
+        }
+      }
       * {
         margin: 0;
         padding: 0;
@@ -664,6 +716,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        opacity: 0;
+        transition: opacity 0.28s cubic-bezier(.4,0,.2,1);
+        pointer-events: none;
+      }
+      .modal-backdrop.show {
+        opacity: 1;
+        pointer-events: auto;
       }
       .modal-box {
         background: #fff;
@@ -674,6 +733,13 @@
         padding: 28px 24px 20px 24px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
         position: relative;
+        opacity: 0;
+        transform: scale(0.92);
+        transition: opacity 0.28s cubic-bezier(.4,0,.2,1), transform 0.28s cubic-bezier(.4,0,.2,1);
+      }
+      .modal-backdrop.show .modal-box {
+        opacity: 1;
+        transform: scale(1);
       }
       .modal-box h3 {
         margin-top: 0;
@@ -801,6 +867,10 @@
   </head>
   <body class="light-mode">
     <div class="top-menu">
+      <button id="lists-btn" class="lists-btn-prominent" title="Manage Lists">
+        <i class="fas fa-list-ul"></i>
+        <span class="lists-btn-label">Lists</span>
+      </button>
       <div class="app-title">
         <i class="fas fa-shopping-basket"></i>
         <span>Ryutsu</span>
@@ -886,6 +956,7 @@
             <i class="fas fa-search"></i> Search Prices
           </button>
         </div>
+        <!-- List Modal Triggered by Top Menu -->
         <div class="success-section message-section" id="success-section"></div>
         <div class="error-section message-section" id="error-section"></div>
       </section>
@@ -946,6 +1017,18 @@
     </div>
 
     <script>
+      function animateModalIn(modal) {
+        setTimeout(() => {
+          modal.classList.add("show");
+        }, 10);
+      }
+      function animateModalOut(modal, cb) {
+        modal.classList.remove("show");
+        setTimeout(() => {
+          if (modal.parentNode) modal.parentNode.removeChild(modal);
+          if (cb) cb();
+        }, 280);
+      }
       function showHelpModal() {
         if (document.getElementById("help-modal-backdrop")) return;
         const modal = document.createElement("div");
@@ -969,11 +1052,12 @@
           </div>
         `;
         document.body.appendChild(modal);
+        animateModalIn(modal);
         document.getElementById("close-help-modal").onclick = () => {
-          modal.remove();
+          animateModalOut(modal);
         };
         modal.onclick = (e) => {
-          if (e.target === modal) modal.remove();
+          if (e.target === modal) animateModalOut(modal);
         };
       }
 
@@ -1338,10 +1422,11 @@
                 <button id='open-universalis-btn' style='margin-top:18px;width:100%;padding:12px 0;background:#6366f1;color:#fff;border:none;border-radius:7px;font-weight:600;font-size:1rem;cursor:pointer;transition:background 0.2s;'><i class='fas fa-external-link-alt'></i> Open In Universalis</button>
               </div>`;
               document.body.appendChild(modal);
+              animateModalIn(modal);
               document.getElementById("close-universalis-modal").onclick = () =>
-                modal.remove();
+                animateModalOut(modal);
               modal.onclick = (e) => {
-                if (e.target === modal) modal.remove();
+                if (e.target === modal) animateModalOut(modal);
               };
               document.getElementById("open-universalis-btn").onclick = () => {
                 window.open(
@@ -1572,9 +1657,7 @@
           ).length;
           resultsInfo.textContent = `Fetched IDs for ${validItems} items. Getting market data...`;
           if (validItems < itemsWithIds.length) {
-            resultsInfo.textContent += ` (${
-              itemsWithIds.length - validItems
-            } items had issues)`;
+            resultsInfo.textContent += ` (${itemsWithIds.length - validItems} items had issues)`;
           }
           const marketData = await fetchMarketData(dc, itemsWithIds);
           showSuccess(`Fetched real-time market data from ${dc} data center`);
@@ -1584,9 +1667,7 @@
           ).length;
           resultsInfo.textContent = `${validMarketItems} items with prices found on ${dc} Data Center`;
           if (validMarketItems < shoppingList.length) {
-            resultsInfo.textContent += ` (${
-              shoppingList.length - validMarketItems
-            } items had issues)`;
+            resultsInfo.textContent += ` (${shoppingList.length - validMarketItems} items had issues)`;
           }
           generateItemRows(shoppingList);
           pathBtn.disabled = false;
@@ -1618,6 +1699,133 @@
         }, 500);
       });
 
+      // --- List Modal Logic ---
+      const LS_PREFIX = "ryutsu-list-";
+      let listModal = null;
+      function showListModal() {
+        if (document.getElementById("list-modal-backdrop")) return;
+        const modal = document.createElement("div");
+        modal.className = "modal-backdrop";
+        modal.id = "list-modal-backdrop";
+        modal.innerHTML = `
+          <div class="modal-box" style="max-width:420px;width:95vw;">
+            <button class="close-btn" id="close-list-modal" title="Close">&times;</button>
+            <h3><i class="fas fa-list-ul"></i> Manage Lists</h3>
+            <div class="input-group">
+              <label for="modal-list-name"><i class="fas fa-save"></i> List Name</label>
+              <input id="modal-list-name" type="text" placeholder="Enter list name to save/load" style="width:100%;margin-bottom:8px;" />
+            </div>
+            <div class="input-group">
+              <button id="modal-save-list-btn" class="btn btn-secondary" style="width:100%;margin-bottom:8px;"><i class="fas fa-save"></i> Save List</button>
+              <select id="modal-load-list-select" style="width:100%;margin-bottom:8px;"></select>
+              <button id="modal-delete-list-btn" class="btn btn-primary" style="width:100%;background:#e74c3c;"><i class="fas fa-trash"></i> Delete List</button>
+            </div>
+            <div class="success-section message-section" id="modal-success-section"></div>
+            <div class="error-section message-section" id="modal-error-section"></div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+        animateModalIn(modal);
+        listModal = modal;
+        // Modal logic
+        const modalListName = document.getElementById("modal-list-name");
+        const modalSaveListBtn = document.getElementById("modal-save-list-btn");
+        const modalLoadListSelect = document.getElementById("modal-load-list-select");
+        const modalDeleteListBtn = document.getElementById("modal-delete-list-btn");
+        const modalSuccessSection = document.getElementById("modal-success-section");
+        const modalErrorSection = document.getElementById("modal-error-section");
+        function getSavedListNames() {
+          const names = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith(LS_PREFIX)) {
+              names.push(key.substring(LS_PREFIX.length));
+            }
+          }
+          return names.sort();
+        }
+        function updateLoadListSelect() {
+          const names = getSavedListNames();
+          modalLoadListSelect.innerHTML = '<option value="">-- Load Saved List --</option>' +
+            names.map(n => `<option value="${n}">${n}</option>`).join("");
+        }
+        function showModalError(message) {
+          modalErrorSection.style.display = "block";
+          modalErrorSection.innerHTML = `<h3><i class='fas fa-exclamation-triangle'></i> Error</h3><p>${message}</p>`;
+          modalErrorSection.classList.add("message-section");
+        }
+        function showModalSuccess(message) {
+          modalSuccessSection.style.display = "block";
+          modalSuccessSection.innerHTML = `<h3><i class='fas fa-check-circle'></i> Success</h3><p>${message}</p>`;
+          modalSuccessSection.classList.add("message-section");
+        }
+        function hideModalMessages() {
+          modalErrorSection.style.display = "none";
+          modalSuccessSection.style.display = "none";
+        }
+        function saveCurrentList() {
+          const name = modalListName.value.trim();
+          if (!name) {
+            showModalError("Please enter a name for your list.");
+            return;
+          }
+          const itemsText = itemsInput.value;
+          const dc = datacenterSelect.value;
+          if (!itemsText) {
+            showModalError("No items to save.");
+            return;
+          }
+          const data = {
+            itemsText,
+            datacenter: dc,
+            isHQ,
+          };
+          localStorage.setItem(LS_PREFIX + name, JSON.stringify(data));
+          showModalSuccess(`List '<b>${name}</b>' saved locally.`);
+          updateLoadListSelect();
+        }
+        function loadSelectedList() {
+          const name = modalLoadListSelect.value;
+          if (!name) return;
+          const raw = localStorage.getItem(LS_PREFIX + name);
+          if (!raw) {
+            showModalError("Selected list not found.");
+            return;
+          }
+          try {
+            const data = JSON.parse(raw);
+            itemsInput.value = data.itemsText || "";
+            datacenterSelect.value = data.datacenter || "";
+            isHQ = !!data.isHQ;
+            updateQualityButtons();
+            modalListName.value = name;
+            showModalSuccess(`List '<b>${name}</b>' loaded.`);
+          } catch (e) {
+            showModalError("Failed to load list data.");
+          }
+        }
+        function deleteSelectedList() {
+          const name = modalLoadListSelect.value;
+          if (!name) {
+            showModalError("Select a list to delete.");
+            return;
+          }
+          if (confirm(`Delete list '${name}'? This cannot be undone.`)) {
+            localStorage.removeItem(LS_PREFIX + name);
+            showModalSuccess(`List '<b>${name}</b>' deleted.`);
+            updateLoadListSelect();
+            if (modalListName.value === name) modalListName.value = "";
+          }
+        }
+        modalSaveListBtn.onclick = saveCurrentList;
+        modalLoadListSelect.onchange = loadSelectedList;
+        modalDeleteListBtn.onclick = deleteSelectedList;
+        document.getElementById("close-list-modal").onclick = () => animateModalOut(modal);
+        modal.onclick = (e) => { if (e.target === modal) animateModalOut(modal); };
+        updateLoadListSelect();
+        hideModalMessages();
+      }
+      document.getElementById("lists-btn").onclick = showListModal;
       document.addEventListener("DOMContentLoaded", () => {
         itemsInput.value = "";
         document.getElementById("help-btn").onclick = showHelpModal;
