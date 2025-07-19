@@ -3,12 +3,162 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ryutsu 0.31</title>
+    <title>Ryutsu 0.4</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <style>
+      .lists-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 340px;
+        max-width: 92vw;
+        background: #fff;
+        color: #222;
+        box-shadow: 2px 0 16px rgba(0, 0, 0, 0.13);
+        z-index: 2000;
+        transform: translateX(-110%);
+        transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid #eaeaea;
+      }
+      .lists-sidebar.open {
+        transform: translateX(0);
+      }
+      .lists-sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 20px 12px 20px;
+        border-bottom: 1px solid #eaeaea;
+        background: #f8f9fa;
+      }
+      .sidebar-close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #888;
+        cursor: pointer;
+        padding: 2px 8px;
+        border-radius: 6px;
+        transition: background 0.18s;
+      }
+      .sidebar-close-btn:hover {
+        background: #f3f4f6;
+      }
+      .lists-sidebar-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 18px 20px 20px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .sidebar-section {
+        margin-bottom: 0;
+      }
+      .sidebar-input {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 7px;
+        border: 1px solid #d1d5db;
+        font-size: 1rem;
+        background: #f8fafc;
+        color: #1a1d28;
+        margin-bottom: 0;
+        transition: border 0.2s;
+      }
+      .sidebar-input:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.13);
+      }
+      .sidebar-lists-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .sidebar-list-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0 10px 0;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 1.01rem;
+        gap: 8px;
+      }
+      .sidebar-list-label {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        color: #6366f1;
+        transition: color 0.18s;
+      }
+      .sidebar-list-label:hover {
+        color: #4f46e5;
+      }
+      .sidebar-list-actions {
+        display: flex;
+        gap: 4px;
+      }
+      .sidebar-list-btn {
+        background: none;
+        border: none;
+        color: #888;
+        font-size: 1.1rem;
+        cursor: pointer;
+        padding: 2px 6px;
+        border-radius: 5px;
+        transition: background 0.18s;
+      }
+      .sidebar-list-btn:hover {
+        background: #f3f4f6;
+        color: #e74c3c;
+      }
+      body.dark-mode .lists-sidebar {
+        background: #18181b;
+        color: #e4e6eb;
+        border-right: 1px solid #222;
+      }
+      body.dark-mode .lists-sidebar-header {
+        background: #000;
+        border-bottom: 1px solid #222;
+      }
+      body.dark-mode .sidebar-input {
+        background: #000;
+        color: #e4e6eb;
+        border-color: #222;
+      }
+      body.dark-mode .sidebar-input:focus {
+        border-color: #818cf8;
+        box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.18);
+      }
+      body.dark-mode .sidebar-list-label {
+        color: #a5b4fc;
+      }
+      body.dark-mode .sidebar-list-label:hover {
+        color: #818cf8;
+      }
+      body.dark-mode .sidebar-list-btn:hover {
+        background: #111;
+        color: #e74c3c;
+      }
+      @media (max-width: 600px) {
+        .lists-sidebar {
+          width: 98vw;
+          min-width: 0;
+        }
+      }
       .lists-btn-prominent {
         display: flex;
         align-items: center;
@@ -905,6 +1055,60 @@
         </button>
       </div>
     </div>
+    <div id="lists-sidebar" class="lists-sidebar">
+      <div class="lists-sidebar-header">
+        <span
+          style="
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+          "
+        >
+          <i class="fas fa-list-ul"></i> Lists
+        </span>
+        <button
+          id="close-lists-sidebar"
+          class="sidebar-close-btn"
+          title="Close"
+        >
+          &times;
+        </button>
+      </div>
+      <div class="lists-sidebar-content">
+        <div class="sidebar-section">
+          <input
+            id="sidebar-list-name"
+            type="text"
+            placeholder="List name..."
+            class="sidebar-input"
+          />
+          <button
+            id="sidebar-save-list-btn"
+            class="btn btn-secondary"
+            style="width: 100%; margin-top: 8px"
+          >
+            <i class="fas fa-save"></i> Save Current
+          </button>
+        </div>
+        <div class="sidebar-section" style="margin-top: 18px">
+          <div
+            style="
+              font-weight: 600;
+              margin-bottom: 8px;
+              font-size: 1rem;
+              display: flex;
+              align-items: center;
+              gap: 6px;
+            "
+          >
+            <i class="fas fa-folder-open"></i> Saved Lists
+          </div>
+          <ul id="sidebar-lists-list" class="sidebar-lists-list"></ul>
+        </div>
+      </div>
+    </div>
 
     <div class="container">
       <section class="input-section">
@@ -959,9 +1163,20 @@
             <i class="fas fa-search"></i> Search Prices
           </button>
         </div>
-        <!-- List Modal Triggered by Top Menu -->
-        <div class="success-section message-section" id="success-section"></div>
-        <div class="error-section message-section" id="error-section"></div>
+        <div
+          id="toast-container"
+          style="
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+          "
+        ></div>
       </section>
 
       <section class="results-section">
@@ -1020,6 +1235,66 @@
     </div>
 
     <script>
+      function showToast(message, type = "info", duration = 3500) {
+        const toastContainer = document.getElementById("toast-container");
+        const toast = document.createElement("div");
+        toast.className = `toast toast-${type}`;
+        toast.style.cssText = `
+          min-width: 220px;
+          max-width: 90vw;
+          background: ${
+            type === "error"
+              ? "#fef2f2"
+              : type === "success"
+              ? "#ecfdf5"
+              : "#f3f4f6"
+          };
+          color: ${
+            type === "error"
+              ? "#b91c1c"
+              : type === "success"
+              ? "#065f46"
+              : "#222"
+          };
+          border: 1px solid ${
+            type === "error"
+              ? "#fecaca"
+              : type === "success"
+              ? "#a7f3d0"
+              : "#d1d5db"
+          };
+          border-radius: 8px;
+          box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+          padding: 14px 22px;
+          font-size: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          opacity: 0;
+          pointer-events: auto;
+          transition: opacity 0.25s, transform 0.25s;
+          margin-bottom: 0;
+        `;
+        let icon = "";
+        if (type === "error")
+          icon = '<i class="fas fa-exclamation-triangle"></i>';
+        else if (type === "success")
+          icon = '<i class="fas fa-check-circle"></i>';
+        else icon = '<i class="fas fa-info-circle"></i>';
+        toast.innerHTML = `${icon}<span>${message}</span>`;
+        toastContainer.appendChild(toast);
+        setTimeout(() => {
+          toast.style.opacity = 1;
+          toast.style.transform = "translateY(0)";
+        }, 10);
+        setTimeout(() => {
+          toast.style.opacity = 0;
+          toast.style.transform = "translateY(20px)";
+          setTimeout(() => {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+          }, 250);
+        }, duration);
+      }
       function animateModalIn(modal) {
         setTimeout(() => {
           modal.classList.add("show");
@@ -1038,11 +1313,27 @@
         modal.className = "modal-backdrop";
         modal.id = "help-modal-backdrop";
         modal.innerHTML = `
-          <div class="modal-box">
+          <div class="modal-box" style="max-width:540px;">
             <button class="close-btn" id="close-help-modal" title="Close">&times;</button>
-            <h3><i class="fas fa-info-circle"></i> Format Example</h3>
-            <p>You can paste items in any of these formats:</p>
-            <pre>
+            <h3><i class="fas fa-info-circle"></i> Ryutsu Help</h3>
+            <div class="help-section">
+              <div class="help-topic" tabindex="0">
+                <div class="help-topic-header"><i class="fas fa-chevron-right"></i> How to Use</div>
+                <div class="help-topic-content">
+                  <ol style="margin-left:1.2em;">
+                    <li>Paste your shopping list in the <b>Paste your items list</b> box.</li>
+                    <li>Select your <b>Data Center</b> and <b>Item Quality</b> (NQ/HQ).</li>
+                    <li>Click <b>Search Prices</b> to fetch real-time market prices.</li>
+                    <li>Review the <b>Shopping List</b> table for best prices per item.</li>
+                    <li>Click <b>Find Path</b> to get an optimal route for shopping across servers.</li>
+                  </ol>
+                </div>
+              </div>
+              <div class="help-topic" tabindex="0">
+                <div class="help-topic-header"><i class="fas fa-chevron-right"></i> Item List Format</div>
+                <div class="help-topic-content">
+                  <p>You can paste items in any of these formats:</p>
+                  <pre>
 4x Claro Walnut Lumber
 1x Titanium Gold Nugget
 5x Ra'Kaznar Ingot
@@ -1050,8 +1341,42 @@
 - 10 Hoptrap Leaf
 - 15 Clary Sage
 
-8 × Effervescent Water</pre>
-            <p>The app will automatically detect quantities and item names.</p>
+8 × Effervescent Water
+                  </pre>
+                  <p>The app will automatically detect quantities and item names.</p>
+                </div>
+              </div>
+              <div class="help-topic" tabindex="0">
+                <div class="help-topic-header"><i class="fas fa-chevron-right"></i> Lists & Saving</div>
+                <div class="help-topic-content">
+                  <ul style="margin-left:1.2em;">
+                    <li>Click <b>Lists</b> to open the sidebar.</li>
+                    <li>Save your current list with a name for later use.</li>
+                    <li>Load or delete saved lists from the sidebar.</li>
+                    <li>Lists are stored locally in your browser.</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="help-topic" tabindex="0">
+                <div class="help-topic-header"><i class="fas fa-chevron-right"></i> Price & Path Details</div>
+                <div class="help-topic-content">
+                  <ul style="margin-left:1.2em;">
+                    <li>Click <b>Price List</b> on any item to see detailed server prices.</li>
+                    <li>After <b>Find Path</b>, click an item icon to copy its name.</li>
+                    <li>Estimated savings are shown if home server prices are available.</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="help-topic" tabindex="0">
+                <div class="help-topic-header"><i class="fas fa-chevron-right"></i> Data Sources</div>
+                <div class="help-topic-content">
+                  <ul style="margin-left:1.2em;">
+                    <li>Market prices from <a href="https://universalis.app/" target="_blank">Universalis.app</a></li>
+                    <li>Item data from <a href="https://xivapi.com/" target="_blank">XIVAPI</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         `;
         document.body.appendChild(modal);
@@ -1062,6 +1387,48 @@
         modal.onclick = (e) => {
           if (e.target === modal) animateModalOut(modal);
         };
+
+        setTimeout(() => {
+          const topics = Array.from(document.querySelectorAll(".help-topic"));
+          topics.forEach((topic, idx) => {
+            const header = topic.querySelector(".help-topic-header");
+            const content = topic.querySelector(".help-topic-content");
+            header.onclick = function () {
+              topics.forEach((other, i) => {
+                const otherHeader = other.querySelector(".help-topic-header");
+                const otherContent = other.querySelector(".help-topic-content");
+                if (other === topic) {
+                  const expanded = topic.classList.toggle("expanded");
+                  if (expanded) {
+                    otherContent.style.maxHeight =
+                      otherContent.scrollHeight + "px";
+                    otherHeader
+                      .querySelector("i")
+                      .classList.replace("fa-chevron-right", "fa-chevron-down");
+                  } else {
+                    otherContent.style.maxHeight = null;
+                    otherHeader
+                      .querySelector("i")
+                      .classList.replace("fa-chevron-down", "fa-chevron-right");
+                  }
+                } else {
+                  other.classList.remove("expanded");
+                  otherContent.style.maxHeight = null;
+                  otherHeader
+                    .querySelector("i")
+                    .classList.replace("fa-chevron-down", "fa-chevron-right");
+                }
+              });
+            };
+            topic.onkeydown = function (e) {
+              if (e.key === "Enter" || e.key === " ") {
+                header.click();
+                e.preventDefault();
+              }
+            };
+            content.style.maxHeight = null;
+          });
+        }, 0);
       }
 
       const itemsInput = document.getElementById("items-input");
@@ -1561,27 +1928,14 @@
       }
 
       function showError(message) {
-        errorSection.style.display = "block";
-        errorSection.innerHTML = `
-        <h3><i class="fas fa-exclamation-triangle"></i> Error</h3>
-        <p>${message}</p>
-      `;
-        errorSection.classList.add("message-section");
+        showToast(message, "error");
       }
 
       function showSuccess(message) {
-        successSection.style.display = "block";
-        successSection.innerHTML = `
-        <h3><i class="fas fa-check-circle"></i> Success</h3>
-        <p>${message}</p>
-      `;
-        successSection.classList.add("message-section");
+        showToast(message, "success");
       }
 
-      function hideMessages() {
-        errorSection.style.display = "none";
-        successSection.style.display = "none";
-      }
+      function hideMessages() {}
 
       const modeToggleBtn = document.getElementById("mode-toggle");
 
@@ -1706,149 +2060,190 @@
         }, 500);
       });
 
-      // --- List Modal Logic ---
       const LS_PREFIX = "ryutsu-list-";
-      let listModal = null;
-      function showListModal() {
-        if (document.getElementById("list-modal-backdrop")) return;
-        const modal = document.createElement("div");
-        modal.className = "modal-backdrop";
-        modal.id = "list-modal-backdrop";
-        modal.innerHTML = `
-          <div class="modal-box" style="max-width:420px;width:95vw;">
-            <button class="close-btn" id="close-list-modal" title="Close">&times;</button>
-            <h3><i class="fas fa-list-ul"></i> Manage Lists</h3>
-            <div class="input-group">
-              <label for="modal-list-name"><i class="fas fa-save"></i> List Name</label>
-              <input id="modal-list-name" type="text" placeholder="Enter list name to save/load" style="width:100%;margin-bottom:8px;" />
-            </div>
-            <div class="input-group">
-              <button id="modal-save-list-btn" class="btn btn-secondary" style="width:100%;margin-bottom:8px;"><i class="fas fa-save"></i> Save List</button>
-              <select id="modal-load-list-select" style="width:100%;margin-bottom:8px;"></select>
-              <button id="modal-delete-list-btn" class="btn btn-primary" style="width:100%;background:#e74c3c;"><i class="fas fa-trash"></i> Delete List</button>
-            </div>
-            <div class="success-section message-section" id="modal-success-section"></div>
-            <div class="error-section message-section" id="modal-error-section"></div>
-          </div>
-        `;
-        document.body.appendChild(modal);
-        animateModalIn(modal);
-        listModal = modal;
-        // Modal logic
-        const modalListName = document.getElementById("modal-list-name");
-        const modalSaveListBtn = document.getElementById("modal-save-list-btn");
-        const modalLoadListSelect = document.getElementById(
-          "modal-load-list-select"
-        );
-        const modalDeleteListBtn = document.getElementById(
-          "modal-delete-list-btn"
-        );
-        const modalSuccessSection = document.getElementById(
-          "modal-success-section"
-        );
-        const modalErrorSection = document.getElementById(
-          "modal-error-section"
-        );
-        function getSavedListNames() {
-          const names = [];
-          for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key.startsWith(LS_PREFIX)) {
-              names.push(key.substring(LS_PREFIX.length));
-            }
-          }
-          return names.sort();
-        }
-        function updateLoadListSelect() {
-          const names = getSavedListNames();
-          modalLoadListSelect.innerHTML =
-            '<option value="">-- Load Saved List --</option>' +
-            names.map((n) => `<option value="${n}">${n}</option>`).join("");
-        }
-        function showModalError(message) {
-          modalErrorSection.style.display = "block";
-          modalErrorSection.innerHTML = `<h3><i class='fas fa-exclamation-triangle'></i> Error</h3><p>${message}</p>`;
-          modalErrorSection.classList.add("message-section");
-        }
-        function showModalSuccess(message) {
-          modalSuccessSection.style.display = "block";
-          modalSuccessSection.innerHTML = `<h3><i class='fas fa-check-circle'></i> Success</h3><p>${message}</p>`;
-          modalSuccessSection.classList.add("message-section");
-        }
-        function hideModalMessages() {
-          modalErrorSection.style.display = "none";
-          modalSuccessSection.style.display = "none";
-        }
-        function saveCurrentList() {
-          const name = modalListName.value.trim();
-          if (!name) {
-            showModalError("Please enter a name for your list.");
-            return;
-          }
-          const itemsText = itemsInput.value;
-          const dc = datacenterSelect.value;
-          if (!itemsText) {
-            showModalError("No items to save.");
-            return;
-          }
-          const data = {
-            itemsText,
-            datacenter: dc,
-            isHQ,
-          };
-          localStorage.setItem(LS_PREFIX + name, JSON.stringify(data));
-          showModalSuccess(`List '<b>${name}</b>' saved locally.`);
-          updateLoadListSelect();
-        }
-        function loadSelectedList() {
-          const name = modalLoadListSelect.value;
-          if (!name) return;
-          const raw = localStorage.getItem(LS_PREFIX + name);
-          if (!raw) {
-            showModalError("Selected list not found.");
-            return;
-          }
-          try {
-            const data = JSON.parse(raw);
-            itemsInput.value = data.itemsText || "";
-            datacenterSelect.value = data.datacenter || "";
-            isHQ = !!data.isHQ;
-            updateQualityButtons();
-            modalListName.value = name;
-            showModalSuccess(`List '<b>${name}</b>' loaded.`);
-          } catch (e) {
-            showModalError("Failed to load list data.");
+      const listsSidebar = document.getElementById("lists-sidebar");
+      const listsBtn = document.getElementById("lists-btn");
+      const closeListsSidebar = document.getElementById("close-lists-sidebar");
+      const sidebarListName = document.getElementById("sidebar-list-name");
+      const sidebarSaveListBtn = document.getElementById(
+        "sidebar-save-list-btn"
+      );
+      const sidebarListsList = document.getElementById("sidebar-lists-list");
+      const sidebarSuccessSection = document.getElementById(
+        "sidebar-success-section"
+      );
+      const sidebarErrorSection = document.getElementById(
+        "sidebar-error-section"
+      );
+
+      function getSavedListNames() {
+        const names = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.startsWith(LS_PREFIX)) {
+            names.push(key.substring(LS_PREFIX.length));
           }
         }
-        function deleteSelectedList() {
-          const name = modalLoadListSelect.value;
-          if (!name) {
-            showModalError("Select a list to delete.");
-            return;
-          }
-          if (confirm(`Delete list '${name}'? This cannot be undone.`)) {
-            localStorage.removeItem(LS_PREFIX + name);
-            showModalSuccess(`List '<b>${name}</b>' deleted.`);
-            updateLoadListSelect();
-            if (modalListName.value === name) modalListName.value = "";
-          }
-        }
-        modalSaveListBtn.onclick = saveCurrentList;
-        modalLoadListSelect.onchange = loadSelectedList;
-        modalDeleteListBtn.onclick = deleteSelectedList;
-        document.getElementById("close-list-modal").onclick = () =>
-          animateModalOut(modal);
-        modal.onclick = (e) => {
-          if (e.target === modal) animateModalOut(modal);
-        };
-        updateLoadListSelect();
-        hideModalMessages();
+        return names.sort();
       }
-      document.getElementById("lists-btn").onclick = showListModal;
+      function showSidebarSuccess(message) {
+        showToast(message, "success");
+      }
+      function showSidebarError(message) {
+        showToast(message, "error");
+      }
+      function updateSidebarLists() {
+        const names = getSavedListNames();
+        sidebarListsList.innerHTML =
+          names.length === 0
+            ? `<li style='color:#888;font-size:0.97rem;padding:10px 0;'>No saved lists.</li>`
+            : "";
+        names.forEach((n) => {
+          const li = document.createElement("li");
+          li.className = "sidebar-list-item";
+          li.innerHTML = `
+            <span class="sidebar-list-label" title="Load list"><i class="fas fa-folder"></i> ${n}</span>
+            <span class="sidebar-list-actions">
+              <button class="sidebar-list-btn" title="Delete" data-listname="${n}"><i class="fas fa-trash"></i></button>
+            </span>
+          `;
+          li.querySelector(".sidebar-list-label").onclick = () =>
+            loadSidebarList(n);
+          li.querySelector(".sidebar-list-btn").onclick = () =>
+            deleteSidebarList(n);
+          sidebarListsList.appendChild(li);
+        });
+      }
+      function saveSidebarList() {
+        const name = sidebarListName.value.trim();
+        if (!name) {
+          showSidebarError("Please enter a name for your list.");
+          return;
+        }
+        const itemsText = itemsInput.value;
+        const dc = datacenterSelect.value;
+        if (!itemsText) {
+          showSidebarError("No items to save.");
+          return;
+        }
+        const data = {
+          itemsText,
+          datacenter: dc,
+          isHQ,
+        };
+        localStorage.setItem(LS_PREFIX + name, JSON.stringify(data));
+        showSidebarSuccess(`List '<b>${name}</b>' saved locally.`);
+        updateSidebarLists();
+      }
+      function loadSidebarList(name) {
+        const raw = localStorage.getItem(LS_PREFIX + name);
+        if (!raw) {
+          showSidebarError("Selected list not found.");
+          return;
+        }
+        try {
+          const data = JSON.parse(raw);
+          itemsInput.value = data.itemsText || "";
+          datacenterSelect.value = data.datacenter || "";
+          isHQ = !!data.isHQ;
+          updateQualityButtons();
+          sidebarListName.value = name;
+          showSidebarSuccess(`List '<b>${name}</b>' loaded.`);
+        } catch (e) {
+          showSidebarError("Failed to load list data.");
+        }
+      }
+      function deleteSidebarList(name) {
+        if (confirm(`Delete list '${name}'? This cannot be undone.`)) {
+          localStorage.removeItem(LS_PREFIX + name);
+          showSidebarSuccess(`List '<b>${name}</b>' deleted.`);
+          updateSidebarLists();
+          if (sidebarListName.value === name) sidebarListName.value = "";
+        }
+      }
+      listsBtn.onclick = function () {
+        listsSidebar.classList.add("open");
+        updateSidebarLists();
+        hideSidebarMessages();
+      };
+      closeListsSidebar.onclick = function () {
+        listsSidebar.classList.remove("open");
+      };
+      sidebarSaveListBtn.onclick = saveSidebarList;
+      document.addEventListener("mousedown", function (e) {
+        if (
+          listsSidebar.classList.contains("open") &&
+          !listsSidebar.contains(e.target) &&
+          e.target !== listsBtn
+        ) {
+          listsSidebar.classList.remove("open");
+        }
+      });
       document.addEventListener("DOMContentLoaded", () => {
         itemsInput.value = "";
         document.getElementById("help-btn").onclick = showHelpModal;
       });
     </script>
+    <style>
+      .help-section {
+        margin-top: 10px;
+      }
+      .help-topic {
+        border-radius: 7px;
+        background: #f8fafc;
+        margin-bottom: 10px;
+        box-shadow: 0 1px 2px rgba(99, 102, 241, 0.04);
+        border: 1px solid #eaeaea;
+        transition: background 0.2s;
+        outline: none;
+      }
+      body.dark-mode .help-topic {
+        background: #18181b;
+        border-color: #222;
+      }
+      .help-topic-header {
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1.05rem;
+        padding: 12px 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        user-select: none;
+        transition: background 0.18s;
+      }
+      .help-topic-header:hover,
+      .help-topic:focus .help-topic-header {
+        background: #eef2ff;
+      }
+      body.dark-mode .help-topic-header:hover,
+      body.dark-mode .help-topic:focus .help-topic-header {
+        background: #222;
+      }
+      .help-topic-content {
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 0 14px;
+        font-size: 0.97rem;
+        color: #444;
+      }
+      body.dark-mode .help-topic-content {
+        color: #d4d4d8;
+      }
+      .help-topic.expanded .help-topic-content {
+        padding: 10px 14px 14px 14px;
+      }
+      .help-topic.expanded .help-topic-header {
+        background: #eef2ff;
+      }
+      body.dark-mode .help-topic.expanded .help-topic-header {
+        background: #222;
+      }
+      .help-topic-header i {
+        transition: transform 0.18s;
+        font-size: 1.1em;
+      }
+    </style>
   </body>
 </html>
