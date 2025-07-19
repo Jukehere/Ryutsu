@@ -4,7 +4,7 @@
   "author": "Juke",
   "description": "Find your way while shopping in ffxiv with Ryutsu.",
   "version": "0.2.1",
-  "main": "src/main.js",
+  "main": "electron-main.js",
   "scripts": {
    "start": "electron .",
    "build": "electron-builder"
