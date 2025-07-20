@@ -12,6 +12,15 @@
       "outputCapture": "std"
     },
     {
+      "name": "Run npm start",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
       "name": "Debug Renderer Process",
       "type": "chrome",
       "request": "attach",

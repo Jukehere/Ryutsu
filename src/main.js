@@ -605,6 +605,7 @@ function generateItemRows(items) {
 
 function generateOptimalPath(items) {
   pathSteps.innerHTML = "";
+  // --- Build itemsByServer and cost ---
   const itemsByServer = {};
   let totalCostValue = 0;
   let homeServerCost = 0;
@@ -616,49 +617,146 @@ function generateOptimalPath(items) {
     itemsByServer[item.server].push(item);
     totalCostValue += item.price * item.quantity;
     if (originalHomeServerPrices[item.itemId]) {
-      homeServerCost +=
-        originalHomeServerPrices[item.itemId] * item.quantity;
+      homeServerCost += originalHomeServerPrices[item.itemId] * item.quantity;
     }
   });
+  // --- Completion state ---
+  let completedSteps = {};
+  try {
+    completedSteps = JSON.parse(sessionStorage.getItem('ryutsu-path-completed') || '{}');
+  } catch (e) { completedSteps = {}; }
+
+  // --- Only show uncompleted servers in the map ---
+  const allServers = Object.keys(itemsByServer);
+  const visibleServers = allServers.filter(server => !completedSteps[`step-${server}`]);
+
+  // --- Render path steps (all, with completed state) ---
   let stepCount = 1;
-  const serverList = Object.keys(itemsByServer);
-  serverList.forEach((server) => {
+  allServers.forEach((server) => {
+    const stepId = `step-${server}`;
+    const isCompleted = !!completedSteps[stepId];
     const step = document.createElement("div");
-    step.className = "path-step";
+    step.className = "path-step" + (isCompleted ? " completed" : "");
+    step.setAttribute('data-step-id', stepId);
     const serverItems = itemsByServer[server];
-    const serverCost = serverItems.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
-    const iconsHtml = serverItems
-      .map((item, idx) => {
-        const iconUrl = item.icon
-          ? `<img src="${item.icon}" alt="" style="width:32px;height:32px;border-radius:6px;object-fit:cover;background:#fff;"/>`
-          : `<i class=\"fas fa-cube\"></i>`;
-        return `
-        <div class="route-item-icon" data-item-name="${item.name.replace(
-          /"/g,
-          "&quot;"
-        )}" data-idx="${stepCount}_${idx}" tabindex="0">
+    const serverCost = serverItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const iconsHtml = serverItems.map((item, idx) => {
+      const iconUrl = item.icon
+        ? `<img src="${item.icon}" alt="" style="width:32px;height:32px;border-radius:6px;object-fit:cover;background:#fff;"/>`
+        : `<i class=\"fas fa-cube\"></i>`;
+      return `
+        <div class="route-item-icon" data-item-name="${item.name.replace(/"/g, "&quot;")}" data-idx="${stepCount}_${idx}" tabindex="0">
           ${iconUrl}
-          <span class="route-tooltip">${item.quantity}x ${
-          item.name
-        }</span>
+          <span class="route-tooltip">${item.quantity}x ${item.name}</span>
         </div>
       `;
-      })
-      .join("");
+    }).join("");
     step.innerHTML = `
-    <div class="step-number">${stepCount}</div>
-    <div class="step-content">
-      <div>Travel to <span class="step-server">${server}</span></div>
-      <div class="route-items-row">${iconsHtml}</div>
-    </div>
-    <div class="step-price">${serverCost.toLocaleString()} Gil</div>
-  `;
+      <input type="checkbox" class="path-step-checkbox" id="${stepId}" ${isCompleted ? 'checked' : ''} style="margin-right:12px;transform:scale(1.3);cursor:pointer;" title="Mark as completed">
+      <div class="step-number">${stepCount}</div>
+      <div class="step-content">
+        <div>Travel to <span class="step-server">${server}</span></div>
+        <div class="route-items-row">${iconsHtml}</div>
+      </div>
+      <div class="step-price">${serverCost.toLocaleString()} Gil</div>
+    `;
     pathSteps.appendChild(step);
     stepCount++;
   });
+
+  let oldMap = document.getElementById('ryutsu-path-map');
+  if (oldMap && oldMap.parentNode) oldMap.parentNode.removeChild(oldMap);
+  if (visibleServers.length > 0) {
+    const mapDiv = document.createElement('div');
+    mapDiv.id = 'ryutsu-path-map';
+    mapDiv.className = '';
+    mapDiv.style = 'width:100%;margin:32px auto 0 auto;display:flex;justify-content:center;align-items:center;min-height:110px;max-width:100vw;overflow-x:auto;';
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const nodeSpacing = Math.max(140, Math.min(200, Math.floor(window.innerWidth / Math.max(3, visibleServers.length + 1))));
+    const width = Math.max(340, nodeSpacing * visibleServers.length);
+    const height = 120;
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('width', width);
+    svg.setAttribute('height', height);
+    svg.classList.add('ryutsu-map-svg');
+    const defs = document.createElementNS(svgNS, 'defs');
+    defs.innerHTML = `
+      <filter id="map-shadow-box" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#6366f1" flood-opacity="0.10"/>
+      </filter>
+      <filter id="map-shadow-green-box" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#10b981" flood-opacity="0.10"/>
+      </filter>
+    `;
+    svg.appendChild(defs);
+    const totalMapWidth = nodeSpacing * (visibleServers.length - 1) + 120;
+    const offsetX = (width - totalMapWidth) / 2 + 60;
+    for (let i = 0; i < visibleServers.length - 1; ++i) {
+      const x1 = offsetX + i * nodeSpacing;
+      const x2 = offsetX + (i + 1) * nodeSpacing;
+      const y = height / 2;
+      const line = document.createElementNS(svgNS, 'line');
+      line.setAttribute('x1', x1);
+      line.setAttribute('y1', y);
+      line.setAttribute('x2', x2);
+      line.setAttribute('y2', y);
+      line.setAttribute('class', 'ryutsu-map-line');
+      svg.appendChild(line);
+    }
+    for (let i = 0; i < visibleServers.length; ++i) {
+      const server = visibleServers[i];
+      const x = offsetX + i * nodeSpacing;
+      const y = height / 2;
+      const rect = document.createElementNS(svgNS, 'rect');
+      rect.setAttribute('x', x - 40);
+      rect.setAttribute('y', y - 28);
+      rect.setAttribute('width', 80);
+      rect.setAttribute('height', 56);
+      rect.setAttribute('rx', 16);
+      rect.setAttribute('class', 'ryutsu-map-node');
+      rect.setAttribute('data-server', server);
+      rect.style.transition = 'all 0.3s cubic-bezier(.4,0,.2,1)';
+      svg.appendChild(rect);
+      const label = document.createElementNS(svgNS, 'text');
+      label.setAttribute('x', x);
+      label.setAttribute('y', y + 4);
+      label.setAttribute('class', 'ryutsu-map-label');
+      label.textContent = server;
+      svg.appendChild(label);
+    }
+    mapDiv.appendChild(svg);
+    pathSection.appendChild(mapDiv);
+    setTimeout(() => {
+      mapDiv.querySelectorAll('.ryutsu-map-node').forEach((rect) => {
+        rect.addEventListener('click', function () {
+          const server = this.getAttribute('data-server');
+          const stepId = `step-${server}`;
+          completedSteps[stepId] = true;
+          sessionStorage.setItem('ryutsu-path-completed', JSON.stringify(completedSteps));
+          generateOptimalPath(items);
+        });
+      });
+    }, 0);
+  }
+
+  setTimeout(() => {
+    const checkboxes = pathSteps.querySelectorAll('.path-step-checkbox');
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', function() {
+        const stepId = this.id;
+        const parent = this.closest('.path-step');
+        if (this.checked) {
+          parent.classList.add('completed');
+          completedSteps[stepId] = true;
+        } else {
+          parent.classList.remove('completed');
+          delete completedSteps[stepId];
+        }
+        sessionStorage.setItem('ryutsu-path-completed', JSON.stringify(completedSteps));
+        generateOptimalPath(items);
+      });
+    });
+  }, 0);
   setTimeout(() => {
     document.querySelectorAll(".route-item-icon").forEach((icon) => {
       icon.addEventListener("click", async function (e) {
@@ -677,6 +775,25 @@ function generateOptimalPath(items) {
       });
     });
   }, 0);
+  if (!document.getElementById('ryutsu-path-completed-style')) {
+    const style = document.createElement('style');
+    style.id = 'ryutsu-path-completed-style';
+    style.innerHTML = `
+      .path-step.completed {
+        opacity: 0.55;
+        text-decoration: line-through;
+        background: #e0e7ef !important;
+      }
+      body.dark-mode .path-step.completed {
+        background: #18181b !important;
+        color: #888;
+      }
+      .path-step-checkbox {
+        vertical-align: middle;
+      }
+    `;
+    document.head.appendChild(style);
+  }
   const savings = homeServerCost - totalCostValue;
   const savingsText =
     savings > 0
