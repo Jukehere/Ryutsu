@@ -31,7 +31,6 @@ const PriceListModal: React.FC<PriceListModalProps> = ({ open, onClose, itemId, 
         const resp = await fetch(url);
         if (!resp.ok) throw new Error("Failed to fetch price list");
         const data = await resp.json();
-        // Universalis returns either {listings: [...]} or {items: { [id]: {listings: [...] } } }
         let arr: any[] = [];
         if (Array.isArray(data.listings)) {
           arr = data.listings;

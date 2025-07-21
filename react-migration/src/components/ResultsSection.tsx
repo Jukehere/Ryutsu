@@ -1,15 +1,11 @@
-import React, { useState } from "react";
-import PriceListModal from "./PriceListModal";
-
 export type ResultItem = {
   item: string;
   quantity: number;
   server: string;
   price: number;
-  iconUrl?: string; // Support for item icon
-  itemId?: number | null; // Add itemId for price list modal
-  // For Find Path logic:
-  qty?: number; // alias for quantity
+  iconUrl?: string;
+  itemId?: number | null;
+  qty?: number;
   homeServer?: string;
   homePrice?: number;
 };
@@ -21,9 +17,12 @@ interface ResultsSectionProps {
 }
 
 export default function ResultsSection({ results, onFindPath, onShowPriceList }: ResultsSectionProps) {
-  // Copy item name to clipboard
   const handleCopy = (item: string) => {
     navigator.clipboard.writeText(item);
+  };
+
+  const isHQ = (row: ResultItem) => {
+    return /\(HQ\)\s*$/.test(row.item) || (row as any).hq === true;
   };
 
   return (
@@ -48,13 +47,13 @@ export default function ResultsSection({ results, onFindPath, onShowPriceList }:
           <tbody id="results-body">
             {results.map((row, idx) => (
               <tr key={idx}>
-                <td style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <td style={{ display: "flex", alignItems: "center", gap: 8, minHeight: 32 }}>
                   {row.iconUrl && (
                     <img
                       src={row.iconUrl}
                       alt=""
                       className="item-icon"
-                      style={{ width: 24, height: 24, marginRight: 4, cursor: "pointer" }}
+                      style={{ width: 24, height: 24, marginRight: 2, cursor: "pointer", display: "inline-block", verticalAlign: "middle" }}
                       title="Copy item name"
                       onClick={() => handleCopy(row.item)}
                     />
@@ -65,6 +64,15 @@ export default function ResultsSection({ results, onFindPath, onShowPriceList }:
                     title="Copy item name"
                     onClick={() => handleCopy(row.item)}
                   >
+                    {isHQ(row) && (
+                      <img
+                        src="https://xivapi.com/img-misc/hq.png"
+                        alt="HQ"
+                        title="High Quality"
+                        className="hq-icon"
+                        style={{ marginRight: 4, marginLeft: 0, width: 18, height: 18, display: "inline-block", verticalAlign: "middle" }}
+                      />
+                    )}
                     {row.item}
                     <button
                       className="btn-universalis"
@@ -95,7 +103,6 @@ export default function ResultsSection({ results, onFindPath, onShowPriceList }:
           <i className="fas fa-route"></i> Find Path
         </button>
       </div>
-      {/* Modal now handled at App level */}
     </section>
   );
 }

@@ -1,4 +1,3 @@
-/* Tooltip for item icon hover in path section */
 .route-item-icon:hover .route-tooltip,
 .route-item-icon:focus .route-tooltip {
   visibility: visible !important;

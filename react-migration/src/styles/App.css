@@ -1,4 +1,51 @@
-/* Modal open/close animation */
+.results-section .hq-icon {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 4px;
+  margin-left: 0;
+  width: 18px;
+  height: 18px;
+}
+.landing-content-box {
+  max-width: 600px;
+  text-align: center;
+  margin: 2rem;
+  background: var(--background-secondary, #fff);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  padding: 2rem;
+  color: var(--text-primary, #222);
+  transition: background 0.2s, color 0.2s;
+}
+body.dark-mode .landing-content-box {
+  background: #23232b;
+  color: #e4e6eb;
+}
+.landing-title {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+  color: inherit;
+}
+.landing-desc {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  color: inherit;
+}
+.landing-main-btn {
+  padding: 0.8rem 2.2rem;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  background: var(--primary, #3b82f6);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.18s, color 0.18s;
+}
+body.dark-mode .landing-main-btn {
+  background: #6366f1;
+  color: #fff;
+}
 .modal-backdrop {
   opacity: 0;
   pointer-events: none;
@@ -17,7 +64,6 @@
   opacity: 1;
   transform: scale(1) translateY(0);
 }
-/* Sidebar slide animation */
 .lists-sidebar {
   position: fixed;
   top: 0;
@@ -38,7 +84,6 @@ body.dark-mode .lists-sidebar {
 .lists-sidebar.open {
   transform: translateX(0);
 }
-/* Universalis Price List Button */
 .btn-universalis {
   margin-left: 8px;
   padding: 6px 12px;
@@ -57,7 +102,6 @@ body.dark-mode .lists-sidebar {
   background: #6366f1;
   color: #fff;
 }
-/* Modern Help Modal Styles */
 .modal-box {
   background: #fff;
   border-radius: 16px;
@@ -147,7 +191,6 @@ body.dark-mode .help-topic-inner {
   text-align: center;
 }
 
-
 .top-menu {
   width: 100vw;
   position: fixed;
@@ -169,7 +212,7 @@ body.dark-mode .top-menu {
 }
 
 .app-root-with-header {
-  padding-top: 64px; /* adjust if your header is taller/shorter */
+  padding-top: 64px;
 }
 
 body.dark-mode .top-menu {
@@ -213,7 +256,6 @@ body.dark-mode .top-menu {
   color: #888;
 }
 
-/* List sidebar enhancements */
 .sidebar-list-item.current-list {
   background: rgba(99, 102, 241, 0.08);
   border-radius: 6px;

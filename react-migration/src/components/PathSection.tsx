@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { ToastContext } from "./ToastContext";
+import { ToastContext } from "../contexts/ToastContext";
 
 interface PathStep {
   server: string;
   items: string[];
   total: number;
-  // Optionally, add iconUrls and item names for each item
   itemDetails?: { name: string; iconUrl?: string }[];
 }
 
@@ -36,7 +35,7 @@ const PathSection: React.FC<PathSectionProps> = ({ steps, totalCost, totalSaving
         <h2><i className="fas fa-route"></i> Optimal Shopping Path</h2>
       </div>
       <div className="path-steps" id="path-steps">
-        {steps.map((step, idx) => (
+        {steps.map((step) => (
           <div
             className={`path-step${completed[step.server] ? " completed" : ""}`}
             key={step.server}
@@ -49,17 +48,24 @@ const PathSection: React.FC<PathSectionProps> = ({ steps, totalCost, totalSaving
               style={{ marginRight: 16, width: 22, height: 22 }}
               aria-label={`Mark ${step.server} as completed`}
             />
-            {/* Layout: left (checkbox+items), center (server), right (price) */}
             <div style={{ display: "flex", flex: 1, alignItems: "center" }}>
               <div style={{ flex: 1, display: "flex", alignItems: "center" }}>
                 <div className="step-items" style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
                   {step.items.map((itemStr, i) => {
                     const match = itemStr.match(/^(.*) x(\d+)$/);
-                    const name = match ? match[1] : itemStr;
+                    let name = match ? match[1] : itemStr;
                     const qty = match ? match[2] : "";
                     let iconUrl: string | undefined = undefined;
                     if (step.itemDetails && step.itemDetails[i] && step.itemDetails[i].iconUrl) {
                       iconUrl = step.itemDetails[i].iconUrl;
+                    }
+                    let isHQ = false;
+                    if (/\s*\(HQ\)$|\sHQ$|★$/.test(name)) {
+                      isHQ = true;
+                      name = name.replace(/\s*\(HQ\)$|\sHQ$|★$/g, "").trim();
+                    }
+                    if (step.itemDetails && step.itemDetails[i] && (step.itemDetails[i] as any).isHQ) {
+                      isHQ = true;
                     }
                     return (
                       <span key={i} style={{ display: "flex", alignItems: "center", marginRight: 14 }}>
@@ -78,6 +84,11 @@ const PathSection: React.FC<PathSectionProps> = ({ steps, totalCost, totalSaving
                           {/* Show item name tooltip on hover (CSS only) */}
                           <span className="route-tooltip">{name}</span>
                         </span>
+                        {isHQ && (
+                          <span title="High Quality" style={{ marginLeft: 4, color: "#3b82f6", fontSize: "1.1em", display: "flex", alignItems: "center" }}>
+                            <i className="fas fa-certificate" style={{ marginRight: 2 }}></i> HQ
+                          </span>
+                        )}
                         {qty && (
                           <span className="route-qty-badge" style={{ marginLeft: 6, fontWeight: 600, color: "#888", fontSize: "1em", minWidth: 24, textAlign: "left" }}>x{qty}</span>
                         )}

@@ -1,4 +1,3 @@
-// src/api.ts
 // API helpers for XIVAPI and Universalis
 
 export type ParsedItem = { quantity: number; name: string };
@@ -26,8 +25,6 @@ const UNIVERSALIS_API = "https://universalis.app/api/v2";
 export type XIVAPIResult = { id: number|null, icon: string|null, canonicalName: string };
 export const fetchItemIdAndIconFromXIVAPI = async (itemName: string): Promise<XIVAPIResult> => {
   try {
-    // Use the original v2.xivapi.com/api/search endpoint and query string for fuzzy matching
-    // Example: https://v2.xivapi.com/api/search?query=Name~"Claro%20Walnut%20Lumber"&sheets=Item&limit=1
     const url = `${XIVAPI_SEARCH}?query=Name~"${encodeURIComponent(itemName)}"&sheets=Item&limit=1`;
     console.log("XIVAPI strict search URL:", url);
     let response = await fetch(url);
@@ -55,10 +52,7 @@ export const fetchItemIdAndIconFromXIVAPI = async (itemName: string): Promise<XI
       const icon = iconPath ? `https://xivapi.com/i/${iconPath}` : (result.IconHD ? `https://xivapi.com${result.IconHD}` : null);
       return { id, icon, canonicalName };
     }
-    // Fallback: try /api/search?string=...&indexes=Item&limit=1
-    const fallbackUrl = `${XIVAPI_SEARCH}?string=${encodeURIComponent(itemName)}&indexes=Item&limit=1`;
-    console.warn("XIVAPI fallback search URL:", fallbackUrl);
-    response = await fetch(fallbackUrl);
+    response = await fetch(url);
     if (!response.ok) {
       console.error("XIVAPI fallback fetch failed", response.status, response.statusText);
       return { id: null, icon: null, canonicalName: itemName };
@@ -81,7 +75,6 @@ export const fetchItemIdAndIconFromXIVAPI = async (itemName: string): Promise<XI
       const icon = iconPath ? `https://xivapi.com/i/${iconPath}` : (result.IconHD ? `https://xivapi.com${result.IconHD}` : null);
       return { id, icon, canonicalName };
     }
-    console.error("XIVAPI: No results for", itemName, "in both strict and fallback search.");
     return { id: null, icon: null, canonicalName: itemName };
   } catch (err) {
     console.error("XIVAPI error", err);
@@ -100,13 +93,25 @@ export const fetchMarketData = async (dataCenter: string, items: { itemId: numbe
   const itemIds = validItems.map(item => item.itemId);
   const url = `${UNIVERSALIS_API}/${dataCenter}/${itemIds.join(",")}?listings=50`;
   console.log("Universalis API URL:", url);
-  const response = await fetch(url);
-  if (!response.ok) {
-    const text = await response.text();
-    console.error("Universalis fetch failed", response.status, response.statusText, text);
-    throw new Error("Failed to fetch market data");
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      const text = await response.text();
+      if (response.status === 504) {
+        console.error("Universalis 504 Gateway Timeout", response.status, response.statusText, text);
+        throw new Error("Market data server is busy or unavailable (504 Gateway Timeout). Please try again later.");
+      }
+      console.error("Universalis fetch failed", response.status, response.statusText, text);
+      throw new Error("Failed to fetch market data");
+    }
+    const data = await response.json();
+    console.log("Universalis API response:", data);
+    return data;
+  } catch (err) {
+    if (err instanceof Error) {
+      throw err;
+    } else {
+      throw new Error("Unknown error occurred while fetching market data");
+    }
   }
-  const data = await response.json();
-  console.log("Universalis API response:", data);
-  return data;
 };

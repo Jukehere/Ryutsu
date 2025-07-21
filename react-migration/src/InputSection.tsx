@@ -1,6 +1,6 @@
 
 import React from "react";
-import { ToastContext } from "./ToastContext";
+import { ToastContext } from "./contexts/ToastContext";
 
 interface InputSectionProps {
   onSearch: (items: string, datacenter: string, isHQ: boolean) => void;
@@ -122,7 +122,6 @@ const InputSection: React.FC<InputSectionProps> = ({
           <i className="fas fa-question-circle"></i> Help
         </button>
       </div>
-      {/* Toasts are now handled globally by ToastProvider */}
     </section>
   );
 };

@@ -1,9 +1,10 @@
 import React from "react";
 
-interface TopMenuProps {
+export type TopMenuProps = {
   onToggleDarkMode: () => void;
   darkMode: boolean;
-}
+  onOpenSidebar: () => void;
+};
 
 const TopMenu: React.FC<TopMenuProps> = ({
   onToggleDarkMode,

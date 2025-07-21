@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ToastContext } from "./ToastContext";
+import { ToastContext } from "../contexts/ToastContext";
 
 interface SidebarProps {
   open: boolean;
@@ -14,8 +14,6 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ open, onClose, lists, currentListName = "", onSaveList, onSelectList, onDeleteList }) => {
   const [listName, setListName] = useState("");
   const toast = React.useContext(ToastContext);
-
-  // Clear input when sidebar opens if no current list is selected
   React.useEffect(() => {
     if (open && currentListName) {
       setListName(currentListName);
@@ -32,11 +30,9 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, lists, currentListName
     }
     const result = onSaveList(trimmedName);
     if (result) {
-      // Only clear input if the saved list is not the current one
       if (trimmedName !== currentListName) setListName("");
       toast.showToast(`List '${trimmedName}' saved!`, "success");
     } else {
-      // The App toast will show the error, but we can also show a toast here for clarity
       toast.showToast("Could not save list. Check your items and name.", "error");
     }
   };
