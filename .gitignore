@@ -1,3 +1,4 @@
 /node_modules
 dist/builder-effective-config.yaml
 /dist
+/react-migration/.github
