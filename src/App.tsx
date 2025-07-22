@@ -148,16 +148,6 @@ const RouterApp: React.FC<RouterAppProps> = ({ darkMode, onToggleDarkMode }) => 
     }
   };
 
-  const handleDatacenterChange = (dc: string) => {
-    setInputDatacenter(dc);
-    if (
-      currentListName &&
-      dc !== (listData[currentListName]?.datacenter || "")
-    ) {
-      setCurrentListName("");
-    }
-  };
-
   const handleIsHQChange = (hq: boolean) => {
     setInputIsHQ(hq);
     if (
@@ -254,7 +244,6 @@ const RouterApp: React.FC<RouterAppProps> = ({ darkMode, onToggleDarkMode }) => 
           datacenter={inputDatacenter}
           isHQ={inputIsHQ}
           setItems={handleItemsChange}
-          setDatacenter={handleDatacenterChange}
           setIsHQ={handleIsHQChange}
           setResults={setResults}
           results={results}
