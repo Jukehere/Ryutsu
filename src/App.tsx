@@ -20,6 +20,7 @@ import HelpModal from "./components/HelpModal";
 import PriceListModal from "./components/PriceListModal";
 import type { ResultItem } from "./components/ResultsSection";
 import { ToastContext } from "./contexts/ToastContext";
+import ScripExchange from "./components/ScripExchange";
 
 type PathStep = {
   server: string;
@@ -292,6 +293,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<LandingPage darkMode={darkMode} onToggleDarkMode={handleToggleDarkMode} />} />
           <Route path="/router" element={<RouterApp darkMode={darkMode} onToggleDarkMode={handleToggleDarkMode} />} />
+          <Route path="/scrip-exchange" element={<ScripExchange darkMode={darkMode} onToggleDarkMode={handleToggleDarkMode} />} />
         </Routes>
       </Router>
     </ToastProvider>

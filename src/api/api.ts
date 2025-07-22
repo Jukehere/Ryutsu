@@ -1,5 +1,3 @@
-// API helpers for XIVAPI and Universalis
-
 export type ParsedItem = { quantity: number; name: string };
 export const parseItems = (text: string): ParsedItem[] => {
   const lines = text.split("\n");

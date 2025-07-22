@@ -1,0 +1,202 @@
+.root {
+  min-height: 70vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: var(--background-secondary, #f7f8fa);
+  transition: background 0.3s;
+}
+.root.dark {
+  background: #000;
+}
+.card {
+  max-width: 1200px;
+  width: 100%;
+  margin: 2rem auto;
+  background: rgba(255,255,255,0.98);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(99,102,241,0.10), 0 1.5px 8px rgba(0,0,0,0.10);
+  padding: 2.5rem 2rem;
+  color: #222;
+  backdrop-filter: blur(2px);
+  border: 1.5px solid #ececec;
+  transition: background 0.3s, color 0.3s;
+}
+.card.dark {
+  background: rgba(0,0,0,0.98);
+  color: #e4e6eb;
+  box-shadow: 0 8px 32px rgba(99,102,241,0.18), 0 1.5px 8px rgba(0,0,0,0.18);
+  border: 1.5px solid #222;
+}
+@media (max-width: 1400px) {
+  .card {
+    max-width: 98vw;
+  }
+}
+@media (max-width: 900px) {
+  .card {
+    max-width: 100vw;
+    padding: 1.2rem 0.5rem;
+    border-radius: 14px;
+  }
+}
+.title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  letter-spacing: 0.02em;
+  color: #6366f1;
+  text-shadow: 0 2px 12px #e0e7ff;
+}
+.title.dark {
+  color: #a5b4fc;
+  text-shadow: 0 2px 12px #23232b;
+}
+.controls {
+  display: flex;
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.select, .input {
+  padding: 0.7rem 1.2rem;
+  font-size: 1.08rem;
+  border-radius: 10px;
+  border: 1.5px solid #ececec;
+  background: #f7f8fa;
+  color: #222;
+  min-width: 180px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px #e0e7ff;
+  transition: background 0.3s, color 0.3s;
+}
+.select.dark, .input.dark {
+  border: 1.5px solid #34344a;
+  background: #18181b;
+  color: #e4e6eb;
+  box-shadow: 0 2px 8px #23232b;
+}
+
+.tableWrap.compact {
+  overflow-x: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(99,102,241,0.07);
+  background: #f7f8fa;
+  border: 1px solid #ececec;
+  margin-bottom: 1.2rem;
+  transition: background 0.3s;
+}
+.tableWrap.compact.dark {
+  box-shadow: 0 2px 8px rgba(99,102,241,0.18);
+  background: #18181b;
+  border: 1px solid #34344a;
+}
+.compact-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.98rem;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.compact-table thead tr {
+  background: linear-gradient(90deg, #e0e7ff 60%, #6366f1 100%);
+  color: #222;
+}
+.compact-table thead tr.dark {
+  background: linear-gradient(90deg, #23232b 60%, #6366f1 100%);
+  color: #e4e6eb;
+}
+.compact-table th {
+  padding: 0.6rem 0.3rem;
+  font-weight: 700;
+  border-bottom: 1px solid #ececec;
+  text-align: left;
+  font-size: 1rem;
+  user-select: none;
+  cursor: pointer;
+}
+.compact-table th.dark {
+  border-bottom: 1px solid #34344a;
+}
+.compact-table td {
+  padding: 0.5rem 0.3rem;
+  font-weight: 600;
+  font-size: 0.98rem;
+}
+.compact-table tr {
+  border-bottom: 1px solid #ececec;
+  background: #fff;
+  transition: background 0.18s;
+  cursor: pointer;
+  height: 38px;
+}
+.compact-table tr.dark {
+  border-bottom: 1px solid #34344a;
+  background: #23232b;
+}
+.compact-table tr:hover {
+  background: #e0e7ff;
+}
+.compact-table tr.dark:hover {
+  background: #18181b;
+}
+.sort-indicator {
+  margin-left: 4px;
+  font-size: 1em;
+  color: #6366f1;
+}
+.sort-indicator.dark {
+  color: #a5b4fc;
+}
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+.button {
+  padding: 0.8rem 1.7rem;
+  font-size: 1.08rem;
+  border-radius: 10px;
+  border: none;
+  background: #6366f1;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+  box-shadow: 0 2px 8px #6366f1;
+  transition: background 0.18s;
+}
+.button:disabled {
+  background: #dfe6e9;
+  color: #888;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.button.dark:disabled {
+  background: #34344a;
+  color: #888;
+}
+.pageInfo {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #6366f1;
+  align-self: center;
+  letter-spacing: 0.01em;
+}
+.pageInfo.dark {
+  color: #a5b4fc;
+}
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  margin: 2rem 0;
+  color: #6366f1;
+  font-weight: 600;
+}
+.loading.dark {
+  color: #a5b4fc;
+}

@@ -2,7 +2,7 @@
   "name": "ryutsu",
   "private": true,
   "homepage": "https://jukehere.github.io/Ryutsu/",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
