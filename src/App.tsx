@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastProvider } from "./contexts/ToastContext";
 import LandingPage from "./LandingPage";
 import { injectFontAwesome } from "./utils/fontawesome-v6-cdn";
@@ -94,8 +94,8 @@ const RouterApp: React.FC<RouterAppProps> = ({ darkMode, onToggleDarkMode }) => 
     setTotalSavings(savings);
   };
 
-  const handleShowPriceList = (item: ResultItem & { itemId?: number }) => {
-    const id = (item as any).itemId ?? undefined;
+  const handleShowPriceList = (item: ResultItem) => {
+    const id = item.itemId ?? undefined;
     if (typeof id !== "number" || !inputDatacenter) {
       toast.showToast("No item ID or datacenter for price list.", "error");
       return;
