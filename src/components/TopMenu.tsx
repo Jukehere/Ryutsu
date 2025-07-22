@@ -14,7 +14,7 @@ const TopMenu: React.FC<TopMenuProps> = ({
     <header className="top-menu" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100vw', height: 64, padding: '0 2rem', boxSizing: 'border-box' }}>
       <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
         <a
-          href="/"
+          href="/Ryutsu/"
           className="menu-btn"
           title="Home"
           style={{
