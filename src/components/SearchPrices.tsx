@@ -10,7 +10,6 @@ interface SearchPricesProps {
   datacenter: string;
   isHQ: boolean;
   setItems: (items: string) => void;
-  setDatacenter: (dc: string) => void;
   setIsHQ: (hq: boolean) => void;
   setResults: (results: ResultItem[]) => void;
   results: ResultItem[];
@@ -25,7 +24,6 @@ const SearchPrices: React.FC<SearchPricesProps> = ({
   datacenter,
   isHQ,
   setItems,
-  setDatacenter,
   setIsHQ,
   setResults,
   results,
@@ -36,9 +34,8 @@ const SearchPrices: React.FC<SearchPricesProps> = ({
 }) => {
   const toast = React.useContext(ToastContext);
 
-  const handleSearch = async (searchItems: string, searchDatacenter: string, searchIsHQ: boolean) => {
+  const handleSearch = async (searchItems: string, searchIsHQ: boolean) => {
     setItems(searchItems);
-    setDatacenter(searchDatacenter);
     setIsHQ(searchIsHQ);
     toast.showToast("Parsing items and fetching prices...", "info");
     try {
@@ -57,7 +54,16 @@ const SearchPrices: React.FC<SearchPricesProps> = ({
         setResults([]);
         return;
       }
-      let marketData = await fetchMarketData(searchDatacenter, validItems.map(({ itemId }) => ({ itemId: itemId as number })));
+      let dc = typeof datacenter === "string" ? datacenter : "";
+      if (!dc) {
+        dc = localStorage.getItem("ryutsu_dc") || "";
+      }
+      if (!dc) {
+        toast.showToast("No data center selected. Please select a data center from the top menu.", "error");
+        setResults([]);
+        return;
+      }
+      let marketData = await fetchMarketData(dc, validItems.map(({ itemId }) => ({ itemId: itemId as number })));
       if (!('items' in marketData) && validItems.length === 1 && 'listings' in marketData) {
         const key = String(validItems[0].itemId);
         marketData = { items: { [key]: marketData } } as {
@@ -73,7 +79,7 @@ const SearchPrices: React.FC<SearchPricesProps> = ({
       const newResults: ResultItem[] = validItems.map(item => {
         const market = marketData.items[item.itemId as number];
         const listings: Listing[] = market && market.listings ? market.listings : [];
-        let filteredListings = listings.filter(l => !!l.hq === !!item.isHQ);
+        let filteredListings = listings.filter(l => l.hq === item.isHQ);
         let fallbackToNQ = false;
         let fallbackToHQ = false;
         if (item.isHQ && filteredListings.length === 0) {
@@ -81,7 +87,7 @@ const SearchPrices: React.FC<SearchPricesProps> = ({
           if (filteredListings.length > 0) fallbackToNQ = true;
         }
         if (!item.isHQ && filteredListings.length === 0) {
-          filteredListings = listings.filter(l => !!l.hq);
+          filteredListings = listings.filter(l => l.hq);
           if (filteredListings.length > 0) fallbackToHQ = true;
         }
         let bestListing: Listing | null = null;
@@ -127,10 +133,8 @@ const SearchPrices: React.FC<SearchPricesProps> = ({
       <InputSection
         onSearch={handleSearch}
         items={items}
-        datacenter={datacenter}
         isHQ={isHQ}
         setItems={setItems}
-        setDatacenter={setDatacenter}
         setIsHQ={setIsHQ}
         onOpenSidebar={onOpenSidebar}
         onOpenHelp={onOpenHelp}

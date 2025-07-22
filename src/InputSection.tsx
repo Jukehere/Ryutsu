@@ -3,12 +3,10 @@ import React from "react";
 import { ToastContext } from "./contexts/ToastContext";
 
 interface InputSectionProps {
-  onSearch: (items: string, datacenter: string, isHQ: boolean) => void;
+  onSearch: (items: string, isHQ: boolean) => void;
   items: string;
-  datacenter: string;
   isHQ: boolean;
   setItems: (items: string) => void;
-  setDatacenter: (dc: string) => void;
   setIsHQ: (isHQ: boolean) => void;
   onOpenSidebar?: () => void;
   onOpenHelp?: () => void;
@@ -17,10 +15,8 @@ interface InputSectionProps {
 const InputSection: React.FC<InputSectionProps> = ({
   onSearch,
   items,
-  datacenter,
   isHQ,
   setItems,
-  setDatacenter,
   setIsHQ,
   onOpenSidebar = () => {},
   onOpenHelp = () => {},
@@ -32,50 +28,23 @@ const InputSection: React.FC<InputSectionProps> = ({
       toast.showToast("Please enter at least one item.", "error");
       return;
     }
-    if (!datacenter) {
-      toast.showToast("Please select a data center.", "error");
-      return;
-    }
-    onSearch(items, datacenter, isHQ);
+    onSearch(items, isHQ);
     toast.showToast("Searching prices...", "info");
   };
 
   return (
     <section className="input-section">
-      <div className="input-group">
-        <label htmlFor="items-input">
-          <i className="fas fa-clipboard-list"></i> Paste your items list
-        </label>
-        <textarea
-          id="items-input"
-          value={items}
-          onChange={e => setItems(e.target.value)}
-          placeholder={`Paste your items here. Example:\n4x Claro Walnut Lumber\n1x Titanium Gold Nugget\n5x Ra'Kaznar Ingot`}
-        ></textarea>
-      </div>
-      <div className="input-row">
+      <div>
         <div className="input-group">
-          <label htmlFor="datacenter">
-            <i className="fas fa-server"></i> Data Center
+          <label htmlFor="items-input">
+            <i className="fas fa-clipboard-list"></i> Paste your items list
           </label>
-          <select
-            id="datacenter"
-            value={datacenter}
-            onChange={e => setDatacenter(e.target.value)}
-          >
-            <option value="">-- Select Data Center --</option>
-            <option value="Elemental">Elemental (JP)</option>
-            <option value="Gaia">Gaia (JP)</option>
-            <option value="Mana">Mana (JP)</option>
-            <option value="Meteor">Meteor (JP)</option>
-            <option value="Aether">Aether (NA)</option>
-            <option value="Primal">Primal (NA)</option>
-            <option value="Crystal">Crystal (NA)</option>
-            <option value="Dynamis">Dynamis (NA)</option>
-            <option value="Chaos">Chaos (EU)</option>
-            <option value="Light">Light (EU)</option>
-            <option value="Materia">Materia (OCE)</option>
-          </select>
+          <textarea
+            id="items-input"
+            value={items}
+            onChange={e => setItems(e.target.value)}
+            placeholder={`Paste your items here. Example:\n4x Claro Walnut Lumber\n1x Titanium Gold Nugget\n5x Ra'Kaznar Ingot`}
+          ></textarea>
         </div>
         <div className="input-group">
           <label htmlFor="hq-switch">
