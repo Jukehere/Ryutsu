@@ -15,7 +15,6 @@ const SCRIP_TYPES = [
   "Purple Gatherer Scrips",
   "Orange Gatherer Scrips"
 ];
-const ITEMS_PER_PAGE = 25;
 
 interface ScripItem {
   itemId: number;
