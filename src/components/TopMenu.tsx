@@ -12,9 +12,26 @@ const TopMenu: React.FC<TopMenuProps> = ({
 }) => {
   return (
     <header className="top-menu" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100vw', height: 64, padding: '0 2rem', boxSizing: 'border-box' }}>
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}></div>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+        <a
+          href="/"
+          className="menu-btn"
+          title="Home"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            fontSize: "1.25rem",
+            textDecoration: "none",
+            color: "inherit"
+          }}
+        >
+          <i className="fas fa-home"></i>
+          <span style={{ fontWeight: 500 }}>Home</span>
+        </a>
+      </div>
       <div className="app-title" style={{ flex: 0, display: 'flex', alignItems: 'center', gap: 12, fontSize: '1.2rem', fontWeight: 600, justifyContent: 'center', whiteSpace: 'nowrap' }}>
-        <span>Ryutsu v0.5</span>
+        <span>Ryutsu v0.6</span>
       </div>
       <div className="menu-controls" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 15 }}>
         <a

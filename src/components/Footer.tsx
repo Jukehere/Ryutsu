@@ -4,7 +4,7 @@ const Footer: React.FC = () => {
   return (
     <footer>
       <p>
-        Ryutsu v0.5 • Not Associated with Square Enix<br />
+        Ryutsu v0.6 • Not Associated with Square Enix<br />
         Prices from <a href="https://universalis.app/" target="_blank" rel="noopener noreferrer">Universalis.app</a> • Item data from <a href="https://xivapi.com/" target="_blank" rel="noopener noreferrer">XIVAPI</a>
       </p>
       <p>
