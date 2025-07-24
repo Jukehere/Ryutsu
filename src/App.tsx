@@ -97,11 +97,13 @@ const RouterApp: React.FC<RouterAppProps> = ({ darkMode, onToggleDarkMode }) => 
 
   const handleShowPriceList = (item: ResultItem) => {
     const id = item.itemId ?? undefined;
-    if (typeof id !== "number" || !inputDatacenter) {
+    const dc = localStorage.getItem("ryutsu_dc") || inputDatacenter;
+    console.log("handleShowPriceList debug:", { item, itemId: id, inputDatacenter: dc });
+    if (typeof id !== "number" || !dc) {
       toast.showToast("No item ID or datacenter for price list.", "error");
       return;
     }
-    setPriceListModal({ open: true, itemId: id, itemName: item.item, datacenter: inputDatacenter });
+    setPriceListModal({ open: true, itemId: id, itemName: item.item, datacenter: dc });
   };
 
   // List persistence helpers
