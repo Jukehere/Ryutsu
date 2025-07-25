@@ -4,6 +4,11 @@ import orangeCrafterScrips from "../data/orange-crafter-scrips.json";
 import purpleGathererScrips from "../data/purple-gatherer-scrips.json";
 import orangeGathererScrips from "../data/orange-gatherer-scrips.json";
 import { fetchItemIdAndIconFromXIVAPI, fetchMarketData } from "../api/api";
+
+interface UniversalisResponse {
+  items?: Record<number, MarketDataEntry>;
+  unresolved?: number[];
+}
 import TopMenu from "./TopMenu";
 import Footer from "./Footer";
 import PurchaseHistoryModal from "./PurchaseHistoryModal";
@@ -117,7 +122,7 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
         let mergedMarketData: MarketData = {};
         for (let i = 0; i < validItems.length; i += batchSize) {
           const batch = validItems.slice(i, i + batchSize);
-          const data = await fetchMarketData(currentServer, batch.map(i => ({ itemId: i.itemId })));
+          const data = await fetchMarketData(currentServer, batch.map(i => ({ itemId: i.itemId }))) as UniversalisResponse;
           let batchMarketData = data.items || {};
           const unresolved: number[] | undefined = data.unresolved;
           if (unresolved && Array.isArray(unresolved) && unresolved.length > 0) {
