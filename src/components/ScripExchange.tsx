@@ -50,9 +50,7 @@ const SORTABLE_COLUMNS = [
   { key: "valuePerScrip", label: "Value/Scrip" }
 ];
 
-const SERVER_LIST = [
-  "Adamantoise", "Aegis", "Alexander", "Anima", "Asura", "Atomos", "Bahamut", "Balmung", "Behemoth", "Belias", "Brynhildr", "Cactuar", "Carbuncle", "Cerberus", "Chocobo", "Coeurl", "Diabolos", "Durandal", "Excalibur", "Exodus", "Faerie", "Famfrit", "Fenrir", "Garuda", "Gilgamesh", "Goblin", "Gungnir", "Hades", "Hyperion", "Ifrit", "Ixion", "Jenova", "Kujata", "Lamia", "Leviathan", "Lich", "Louisoix", "Malboro", "Mandragora", "Masamune", "Mateus", "Midgardsormr", "Moogle", "Odin", "Pandaemonium", "Phoenix", "Ragnarok", "Ramuh", "Ridill", "Sargatanas", "Shinryu", "Shiva", "Siren", "Sophia", "Spriggan", "Tiamat", "Titan", "Tonberry", "Typhon", "Ultima", "Ultros", "Unicorn", "Valefor", "Yojimbo", "Zeromus", "Zodiark"
-];
+const SERVER_LIST: string[] = [];
 
 const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void }> = ({ darkMode, onToggleDarkMode }) => {
   const [scripType, setScripType] = useState<string>(SCRIP_TYPES[0]);
@@ -108,6 +106,7 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
     const fetchData = async () => {
       setLoading(true);
       try {
+        const currentServer = localStorage.getItem("ryutsu_server") || SERVER_LIST[0];
         const validItems = items.filter(i => i.itemId && typeof i.itemId === "number");
         if (validItems.length === 0) {
           setMarketData({});
@@ -118,13 +117,13 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
         let mergedMarketData: MarketData = {};
         for (let i = 0; i < validItems.length; i += batchSize) {
           const batch = validItems.slice(i, i + batchSize);
-          const data = await fetchMarketData(server, batch.map(i => ({ itemId: i.itemId })));
+          const data = await fetchMarketData(currentServer, batch.map(i => ({ itemId: i.itemId })));
           let batchMarketData = data.items || {};
-          const unresolved = (data as any).unresolved;
+          const unresolved: number[] | undefined = data.unresolved;
           if (unresolved && Array.isArray(unresolved) && unresolved.length > 0) {
             const retryItems = batch.filter(i => unresolved.includes(i.itemId));
             if (retryItems.length > 0) {
-              const retryData = await fetchMarketData(server, retryItems.map(i => ({ itemId: i.itemId })));
+              const retryData = await fetchMarketData(currentServer, retryItems.map(i => ({ itemId: i.itemId })));
               batchMarketData = { ...batchMarketData, ...(retryData.items || {}) };
             }
           }
@@ -135,7 +134,7 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
         for (let i = 0; i < validItems.length; i += batchSize) {
           const batch = validItems.slice(i, i + batchSize);
           const batchItemIds = batch.map(item => item.itemId).join(",");
-          const historyUrl = `https://universalis.app/api/v2/history/${server}/${batchItemIds}`;
+          const historyUrl = `https://universalis.app/api/v2/history/${currentServer}/${batchItemIds}`;
           try {
             const resp = await fetch(historyUrl);
             if (resp.ok) {
@@ -160,7 +159,7 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
       }
       setLoading(false);
     };
-    if (server && items.length > 0) fetchData();
+    if ((localStorage.getItem("ryutsu_server") || SERVER_LIST[0]) && items.length > 0) fetchData();
   }, [server, items, setLoading, setMarketData]);
 
   const displayItems = items.map(item => {
