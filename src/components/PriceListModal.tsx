@@ -13,12 +13,38 @@ interface PriceListModalProps {
   itemId: number;
   itemName: string;
   datacenter: string;
+  crossDCMode?: boolean;
 }
 
-const PriceListModal: React.FC<PriceListModalProps> = ({ open, onClose, itemId, itemName, datacenter }) => {
+const PriceListModal: React.FC<PriceListModalProps> = ({ open, onClose, itemId, itemName, datacenter, crossDCMode }) => {
+  useEffect(() => {
+    console.log('PriceListModal props:', { open, itemId, itemName, datacenter, crossDCMode });
+  }, [open, itemId, itemName, datacenter, crossDCMode]);
   const [loading, setLoading] = useState(true);
   const [listings, setListings] = useState<Listing[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  // Region map from SearchPrices
+  const REGION_MAP: Record<string, string> = {
+    "Aether": "America",
+    "Primal": "America",
+    "Crystal": "America",
+    "Dynamis": "America",
+    "Chaos": "Europe",
+    "Light": "Europe",
+    "Elemental": "Japan",
+    "Gaia": "Japan",
+    "Mana": "Japan",
+    "Meteor": "Japan",
+    "Materia": "Oceania",
+  };
+
+  const REGION_DC_LIST: Record<string, string[]> = {
+    America: ["Aether", "Primal", "Crystal", "Dynamis"],
+    Europe: ["Chaos", "Light"],
+    Japan: ["Elemental", "Gaia", "Mana", "Meteor"],
+    Oceania: ["Materia"],
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -27,11 +53,15 @@ const PriceListModal: React.FC<PriceListModalProps> = ({ open, onClose, itemId, 
     setListings([]);
     const fetchListings = async () => {
       try {
-        const url = `https://universalis.app/api/v2/${datacenter}/${itemId}?listings=20`;
+        let endpoint = datacenter;
+        if (crossDCMode && REGION_MAP[datacenter]) {
+          endpoint = REGION_MAP[datacenter].toLowerCase();
+        }
+        const url = `https://universalis.app/api/v2/${endpoint}/${itemId}?listings=20`;
         const resp = await fetch(url);
         if (!resp.ok) throw new Error("Failed to fetch price list");
         const data = await resp.json();
-        let arr: any[] = [];
+        let arr: Listing[] = [];
         if (Array.isArray(data.listings)) {
           arr = data.listings;
         } else if (data.items && data.items[itemId] && Array.isArray(data.items[itemId].listings)) {
@@ -43,20 +73,33 @@ const PriceListModal: React.FC<PriceListModalProps> = ({ open, onClose, itemId, 
         } else {
           setListings(arr);
         }
-      } catch (err) {
+      } catch {
         setError("Failed to load price data.");
       } finally {
         setLoading(false);
       }
     };
     fetchListings();
-  }, [open, itemId, datacenter]);
+  }, [open, itemId, datacenter, crossDCMode]);
 
   return (
     <div className={`modal-backdrop${open ? ' show' : ''}`} id="universalis-modal-backdrop" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal-box" style={{ maxWidth: 480, width: "95vw" }}>
         <button className="close-btn" id="close-universalis-modal" title="Close" onClick={onClose}>&times;</button>
         <h3 style={{ marginBottom: 12 }}><i className="fas fa-tags"></i> {itemName} Price List</h3>
+        {crossDCMode && REGION_MAP[datacenter] && (
+          <div style={{ fontWeight: 600, color: "#6366f1", marginBottom: 8, fontSize: "1.05rem" }}>
+            Region: {REGION_MAP[datacenter]}
+            <div style={{ marginTop: 6, fontWeight: 500, color: "#444", fontSize: "0.98rem" }}>
+              Data Centers in this region:
+              <ul style={{ margin: "4px 0 0 0", padding: 0, listStyle: "none", display: "flex", gap: 10 }}>
+                {REGION_DC_LIST[REGION_MAP[datacenter]]?.map(dc => (
+                  <li key={dc} style={{ background: "#eef2ff", color: "#6366f1", borderRadius: 6, padding: "2px 10px", fontWeight: 600, fontSize: "0.97rem" }}>{dc}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
         <div id="universalis-modal-content" style={{ minHeight: 80, display: "flex", alignItems: "center", justifyContent: "center" }}>
           {loading ? (
             <i className="fas fa-spinner fa-spin"></i>

@@ -17,6 +17,8 @@ interface SearchPricesProps {
   onShowPriceList: (item: ResultItem) => void;
   onOpenSidebar: () => void;
   onOpenHelp: () => void;
+  crossDCMode: boolean;
+  setCrossDCMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const REGION_MAP: Record<string, string> = {
@@ -49,8 +51,9 @@ const SearchPrices: React.FC<SearchPricesProps> = ({
   onShowPriceList,
   onOpenSidebar,
   onOpenHelp,
+  crossDCMode,
+  setCrossDCMode,
 }) => {
-  const [crossDCMode, setCrossDCMode] = React.useState(false);
   const toast = React.useContext(ToastContext);
 
   const handleSearch = async (searchItems: string, searchIsHQ: boolean) => {

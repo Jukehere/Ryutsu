@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastProvider } from "./contexts/ToastContext";
@@ -14,6 +13,20 @@ type RouterAppProps = {
 import TopMenu from "./components/TopMenu";
 import Sidebar from "./components/Sidebar";
 import SearchPrices from "./components/SearchPrices";
+// Duplicate REGION_MAP for region logic
+const REGION_MAP: Record<string, string> = {
+  "Aether": "America",
+  "Primal": "America",
+  "Crystal": "America",
+  "Dynamis": "America",
+  "Chaos": "Europe",
+  "Light": "Europe",
+  "Elemental": "Japan",
+  "Gaia": "Japan",
+  "Mana": "Japan",
+  "Meteor": "Japan",
+  "Materia": "Oceania",
+};
 import PathSection from "./components/PathSection";
 import Footer from "./components/Footer";
 import HelpModal from "./components/HelpModal";
@@ -30,8 +43,8 @@ type PathStep = {
 };
 
 const RouterApp: React.FC<RouterAppProps> = ({ darkMode, onToggleDarkMode }) => {
+  const [crossDCMode, setCrossDCMode] = useState(false);
   const [results, setResults] = useState<ResultItem[]>([]);
-  // List state and persistence
   const LS_PREFIX = "ryutsu-list-";
   const [lists, setLists] = useState<string[]>([]);
   const [listData, setListData] = useState<{ [name: string]: { itemsText: string; datacenter: string; isHQ: boolean } }>({});
@@ -45,8 +58,7 @@ const RouterApp: React.FC<RouterAppProps> = ({ darkMode, onToggleDarkMode }) => 
   const [helpOpen, setHelpOpen] = useState(false);
   const [currentListName, setCurrentListName] = useState(""); // Track currently loaded list
   const toast = React.useContext(ToastContext);
-  // Price List modal state
-  const [priceListModal, setPriceListModal] = useState<{ open: boolean; itemId?: number; itemName: string; datacenter: string }>({ open: false, itemId: undefined, itemName: "", datacenter: "" });
+  const [priceListModal, setPriceListModal] = useState<{ open: boolean; itemId?: number; itemName: string; datacenter: string; crossDCMode?: boolean }>({ open: false, itemId: undefined, itemName: "", datacenter: "", crossDCMode: false });
 
   useEffect(() => {
     // FontAwesome is injected at the top level
@@ -98,15 +110,20 @@ const RouterApp: React.FC<RouterAppProps> = ({ darkMode, onToggleDarkMode }) => 
   const handleShowPriceList = (item: ResultItem) => {
     const id = item.itemId ?? undefined;
     const dc = localStorage.getItem("ryutsu_dc") || inputDatacenter;
-    console.log("handleShowPriceList debug:", { item, itemId: id, inputDatacenter: dc });
+    const region = REGION_MAP[dc];
+    let endpoint = dc;
+    if (crossDCMode && region) {
+      endpoint = region.toLowerCase();
+    }
+    // Log the current crossDCMode for debugging
+    console.log("handleShowPriceList debug:", { item, itemId: id, inputDatacenter: dc, endpoint, crossDCMode });
     if (typeof id !== "number" || !dc) {
       toast.showToast("No item ID or datacenter for price list.", "error");
       return;
     }
-    setPriceListModal({ open: true, itemId: id, itemName: item.item, datacenter: dc });
+    setPriceListModal({ open: true, itemId: id, itemName: item.item, datacenter: endpoint, crossDCMode });
   };
 
-  // List persistence helpers
   const getSavedListNames = () => {
     const names: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
@@ -225,7 +242,6 @@ const RouterApp: React.FC<RouterAppProps> = ({ darkMode, onToggleDarkMode }) => 
         onOpenSidebar={handleSidebarToggle}
       />
       <div className={"app-root-with-header"}>
-        {/* Sidebar and backdrop */}
         {sidebarOpen && (
           <div
             style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 1999, background: 'rgba(0,0,0,0.08)' }}
@@ -254,6 +270,8 @@ const RouterApp: React.FC<RouterAppProps> = ({ darkMode, onToggleDarkMode }) => 
           onShowPriceList={handleShowPriceList}
           onOpenSidebar={handleSidebarToggle}
           onOpenHelp={() => setHelpOpen(true)}
+          crossDCMode={crossDCMode}
+          setCrossDCMode={setCrossDCMode}
         />
         <PathSection steps={pathSteps} totalCost={totalCost} totalSavings={totalSavings} />
         <Footer />
@@ -263,6 +281,7 @@ const RouterApp: React.FC<RouterAppProps> = ({ darkMode, onToggleDarkMode }) => 
           itemId={priceListModal.itemId ?? 0}
           itemName={priceListModal.itemName}
           datacenter={priceListModal.datacenter}
+          crossDCMode={priceListModal.crossDCMode}
         />
       </div>
     </>
