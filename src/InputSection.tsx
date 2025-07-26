@@ -10,6 +10,8 @@ interface InputSectionProps {
   setIsHQ: (isHQ: boolean) => void;
   onOpenSidebar?: () => void;
   onOpenHelp?: () => void;
+  crossDCMode?: boolean;
+  setCrossDCMode?: (mode: boolean) => void;
 }
 
 const InputSection: React.FC<InputSectionProps> = ({
@@ -20,6 +22,8 @@ const InputSection: React.FC<InputSectionProps> = ({
   setIsHQ,
   onOpenSidebar = () => {},
   onOpenHelp = () => {},
+  crossDCMode = false,
+  setCrossDCMode = () => {},
 }) => {
   const toast = React.useContext(ToastContext);
 
@@ -74,6 +78,50 @@ const InputSection: React.FC<InputSectionProps> = ({
         <button id="search-btn" className="btn btn-primary" onClick={handleClick}>
           <i className="fas fa-search"></i> Search Prices
         </button>
+        <span style={{ fontWeight: 600, fontSize: "1.05rem", marginLeft: 16, display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ marginRight: 8 }}>Cross-DC Mode</span>
+          <span style={{ position: "relative", display: "inline-block", width: 46, height: 26 }}>
+            <span
+              role="switch"
+              aria-checked={!!crossDCMode}
+              tabIndex={0}
+              onClick={() => setCrossDCMode && setCrossDCMode(!crossDCMode)}
+              onKeyDown={e => {
+                if (e.key === "Enter" || e.key === " ") {
+                  setCrossDCMode && setCrossDCMode(!crossDCMode);
+                }
+              }}
+              style={{
+                position: "absolute",
+                cursor: "pointer",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: crossDCMode ? "#6366f1" : "#ccc",
+                transition: "background 0.2s",
+                borderRadius: 26,
+                boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+                outline: "none",
+              }}
+            >
+              <span
+                style={{
+                  position: "absolute",
+                  left: crossDCMode ? 22 : 2,
+                  top: 2,
+                  width: 22,
+                  height: 22,
+                  background: "#fff",
+                  borderRadius: "50%",
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.12)",
+                  transition: "left 0.2s",
+                  border: "1px solid #eee",
+                }}
+              />
+            </span>
+          </span>
+        </span>
       </div>
       <div style={{ display: "flex", gap: 12, marginTop: 16, justifyContent: "flex-start", flexWrap: "wrap" }}>
         <button

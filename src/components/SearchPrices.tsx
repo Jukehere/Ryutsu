@@ -19,6 +19,24 @@ interface SearchPricesProps {
   onOpenHelp: () => void;
 }
 
+const REGION_MAP: Record<string, string> = {
+  // NA
+  "Aether": "America",
+  "Primal": "America",
+  "Crystal": "America",
+  "Dynamis": "America",
+  // EU
+  "Chaos": "Europe",
+  "Light": "Europe",
+  // JP
+  "Elemental": "Japan",
+  "Gaia": "Japan",
+  "Mana": "Japan",
+  "Meteor": "Japan",
+  // OCE
+  "Materia": "Oceania",
+};
+
 const SearchPrices: React.FC<SearchPricesProps> = ({
   items,
   datacenter,
@@ -32,6 +50,7 @@ const SearchPrices: React.FC<SearchPricesProps> = ({
   onOpenSidebar,
   onOpenHelp,
 }) => {
+  const [crossDCMode, setCrossDCMode] = React.useState(false);
   const toast = React.useContext(ToastContext);
 
   const handleSearch = async (searchItems: string, searchIsHQ: boolean) => {
@@ -54,16 +73,21 @@ const SearchPrices: React.FC<SearchPricesProps> = ({
         setResults([]);
         return;
       }
-      let dc = typeof datacenter === "string" ? datacenter : "";
-      if (!dc) {
-        dc = localStorage.getItem("ryutsu_dc") || "";
-      }
-      if (!dc) {
-        toast.showToast("No data center selected. Please select a data center from the top menu.", "error");
-        setResults([]);
-        return;
-      }
-      let marketData = await fetchMarketData(dc, validItems.map(({ itemId }) => ({ itemId: itemId as number })));
+    let dc = typeof datacenter === "string" ? datacenter : "";
+    if (!dc) {
+      dc = localStorage.getItem("ryutsu_dc") || "";
+    }
+    if (!dc) {
+      toast.showToast("No data center selected. Please select a data center from the top menu.", "error");
+      setResults([]);
+      return;
+    }
+    let endpoint = dc;
+    if (crossDCMode && REGION_MAP[dc]) {
+      endpoint = REGION_MAP[dc];
+      toast.showToast(`Cross-DC mode enabled: Searching Region '${endpoint}'`, "info");
+    }
+    let marketData = await fetchMarketData(endpoint, validItems.map(({ itemId }) => ({ itemId: itemId as number })));
       if (!('items' in marketData) && validItems.length === 1 && 'listings' in marketData) {
         const key = String(validItems[0].itemId);
         marketData = { items: { [key]: marketData } } as {
@@ -138,6 +162,8 @@ const SearchPrices: React.FC<SearchPricesProps> = ({
         setIsHQ={setIsHQ}
         onOpenSidebar={onOpenSidebar}
         onOpenHelp={onOpenHelp}
+        crossDCMode={crossDCMode}
+        setCrossDCMode={setCrossDCMode}
       />
       <ResultsSection
         results={results}
