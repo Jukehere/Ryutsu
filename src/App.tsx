@@ -34,6 +34,7 @@ import PriceListModal from "./components/PriceListModal";
 import type { ResultItem } from "./components/ResultsSection";
 import { ToastContext } from "./contexts/ToastContext";
 import ScripExchange from "./components/ScripExchange";
+import TomeExchange from "./components/TomeExchange";
 
 type PathStep = {
   server: string;
@@ -154,10 +155,8 @@ const RouterApp: React.FC<RouterAppProps> = ({ darkMode, onToggleDarkMode }) => 
 
   useEffect(() => {
     loadAllLists();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Clear current list name if any input changes from loaded list
   const handleItemsChange = (items: string) => {
     setInputItems(items);
     if (
@@ -315,6 +314,7 @@ const App: React.FC = () => {
           <Route path="/" element={<LandingPage darkMode={darkMode} onToggleDarkMode={handleToggleDarkMode} />} />
           <Route path="/router" element={<RouterApp darkMode={darkMode} onToggleDarkMode={handleToggleDarkMode} />} />
           <Route path="/scrip-exchange" element={<ScripExchange darkMode={darkMode} onToggleDarkMode={handleToggleDarkMode} />} />
+          <Route path="/tome-exchange" element={<TomeExchange darkMode={darkMode} onToggleDarkMode={handleToggleDarkMode} />} />
         </Routes>
       </Router>
     </ToastProvider>

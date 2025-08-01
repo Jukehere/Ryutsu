@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import purpleCrafterScrips from "../data/purple-crafter-scrips.json";
-import orangeCrafterScrips from "../data/orange-crafter-scrips.json";
-import purpleGathererScrips from "../data/purple-gatherer-scrips.json";
-import orangeGathererScrips from "../data/orange-gatherer-scrips.json";
+import heliometryTomes from "../data/heliometry-tomes.json";
+import poeticsTomes from "../data/poetics-tomes.json";
 import { fetchItemIdAndIconFromXIVAPI, fetchMarketData } from "../api/api";
 
 interface UniversalisResponse {
@@ -15,14 +13,12 @@ import PurchaseHistoryModal from "./PurchaseHistoryModal";
 import ItemCalcModal from "./ItemCalcModal";
 import "../styles/ScripExchange.css";
 
-const SCRIP_TYPES = [
-  "Purple Crafter Scrips",
-  "Orange Crafter Scrips",
-  "Purple Gatherer Scrips",
-  "Orange Gatherer Scrips"
+const TOME_TYPES = [
+  "Allagan Tomestone of Heliometry",
+  "Allagan Tomestone of Poetics"
 ];
 
-interface ScripItem {
+interface TomeItem {
   itemId: number;
   name: string;
   cost: number;
@@ -49,18 +45,18 @@ type MarketData = Record<number, MarketDataEntry>;
 
 const SORTABLE_COLUMNS = [
   { key: "name", label: "Item" },
-  { key: "cost", label: "Cost (Scrips)" },
+  { key: "cost", label: "Cost (Tomes)" },
   { key: "minPrice", label: "Min Price" },
   { key: "weeklySales", label: "Weekly Sales" },
   { key: "qtyPerWeek", label: "Qty/Week" },
-  { key: "valuePerScrip", label: "Value/Scrip" }
+  { key: "valuePerTome", label: "Value/Tome" }
 ];
 
 const SERVER_LIST: string[] = [];
 
-const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void }> = ({ darkMode, onToggleDarkMode }) => {
-  const [scripType, setScripType] = useState<string>(SCRIP_TYPES[0]);
-  const [items, setItems] = useState<ScripItem[]>([]);
+const TomeExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void }> = ({ darkMode, onToggleDarkMode }) => {
+  const [tomeType, setTomeType] = useState<string>(TOME_TYPES[0]);
+  const [items, setItems] = useState<TomeItem[]>([]);
   const [marketData, setMarketData] = useState<MarketData>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [datacenter, setDatacenter] = useState<string>(() => localStorage.getItem("ryutsu_dc") || "");
@@ -75,12 +71,10 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
   const handleSearchItems = () => {
     setLoading(true);
     const fileMap: Record<string, Array<{ name: string; cost: number }>> = {
-      "Purple Crafter Scrips": purpleCrafterScrips,
-      "Orange Crafter Scrips": orangeCrafterScrips,
-      "Purple Gatherer Scrips": purpleGathererScrips,
-      "Orange Gatherer Scrips": orangeGathererScrips
+      "Allagan Tomestone of Heliometry": heliometryTomes,
+      "Allagan Tomestone of Poetics": poeticsTomes
     };
-    const loaded = fileMap[scripType] || [];
+    const loaded = fileMap[tomeType] || [];
     Promise.all(
       loaded.map(async (item) => {
         const xivapi = await fetchItemIdAndIconFromXIVAPI(item.name);
@@ -103,6 +97,12 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
   useEffect(() => {
     setDatacenter(localStorage.getItem("ryutsu_dc") || "");
   }, [setDatacenter]);
+  const handleCalculatorOpen = (item: typeof displayItems[0]) => {
+    setCalculatorItem(item);
+    setItemCount(1);
+    setCalcRevenue(item.minPrice ? item.minPrice : 0);
+    setCalcModalOpen(true);
+  };
 
   useEffect(() => {
     const handleStorage = () => {
@@ -157,12 +157,10 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
             console.error(`Failed to fetch history for items: ${batchItemIds}`);
           }
         }
-
         Object.entries(historyData).forEach(([itemId, entry]) => {
           if (!mergedMarketData[Number(itemId)]) mergedMarketData[Number(itemId)] = {};
           mergedMarketData[Number(itemId)].recentHistory = Array.isArray(entry.entries) ? entry.entries : [];
         });
-
         setMarketData(mergedMarketData);
       } catch {
         setMarketData({});
@@ -186,13 +184,13 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
       weeklySales = recent.length;
       qtyPerWeek = recent.reduce((sum: number, h: MarketHistory) => sum + h.quantity, 0);
     }
-    const valuePerScrip = item.cost ? (minPrice / item.cost) : 0;
+    const valuePerTome = item.cost ? (minPrice / item.cost) : 0;
     return {
       ...item,
       minPrice,
       weeklySales,
       qtyPerWeek,
-      valuePerScrip
+      valuePerTome
     };
   });
 
@@ -224,13 +222,6 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
     setPriceListModal({ open: true, itemId: item.itemId, itemName: item.name, datacenter });
   };
 
-  const handleCalculatorOpen = (item: typeof displayItems[0]) => {
-    setCalculatorItem(item);
-    setItemCount(1);
-    setCalcRevenue(item.minPrice ? item.minPrice : 0);
-    setCalcModalOpen(true);
-  };
-
   const handleCalculatorClose = () => {
     setCalculatorItem(null);
     setItemCount(1);
@@ -247,12 +238,10 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
       setCalcRevenue(0);
     }
   };
-  
-  const scripIcons: Record<string, string> = {
-    "Purple Crafter Scrips": "https://xivapi.com/i/065000/065088.png",
-    "Orange Crafter Scrips": "https://xivapi.com/i/065000/065110.png",
-    "Purple Gatherer Scrips": "https://xivapi.com/i/065000/065087.png",
-    "Orange Gatherer Scrips": "https://xivapi.com/i/065000/065109.png"
+
+  const tomeIcons: Record<string, string> = {
+    "Allagan Tomestone of Heliometry": "https://xivapi.com/i/065000/065108.png",
+    "Allagan Tomestone of Poetics": "https://xivapi.com/i/065000/065023.png"
   };
 
   return (
@@ -260,19 +249,20 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
       <TopMenu darkMode={darkMode} onToggleDarkMode={onToggleDarkMode} onOpenSidebar={() => {}} />
       <div className={`root app-root-with-header${darkMode ? ' dark' : ''}`}> 
         <div className={`card${darkMode ? ' dark' : ''}`}> 
-          <h2 className={`title${darkMode ? ' dark' : ''}`}>Scrip Exchange</h2>
+          <h2 className={`title${darkMode ? ' dark' : ''}`}>Tome Exchange</h2>
           <div className="controls" style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: 18 }}>
+            {/* Tome type XIVAPI icon buttons */}
             <div style={{ display: 'flex', gap: 14 }}>
-              {SCRIP_TYPES.map(type => (
+              {TOME_TYPES.map(type => (
                 <button
                   key={type}
-                  onClick={() => setScripType(type)}
+                  onClick={() => setTomeType(type)}
                   style={{
-                    background: scripType === type ? (darkMode ? '#6366f1' : '#6366f1') : (darkMode ? '#23232b' : '#fff'),
-                    border: scripType === type ? '2px solid #a5b4fc' : '2px solid #c7d2fe',
+                    background: tomeType === type ? (darkMode ? '#6366f1' : '#6366f1') : (darkMode ? '#23232b' : '#fff'),
+                    border: tomeType === type ? '2px solid #a5b4fc' : '2px solid #c7d2fe',
                     borderRadius: 12,
                     padding: '8px',
-                    boxShadow: scripType === type ? '0 2px 8px #6366f1' : '0 1px 4px #e0e7ff',
+                    boxShadow: tomeType === type ? '0 2px 8px #6366f1' : '0 1px 4px #e0e7ff',
                     cursor: 'pointer',
                     outline: 'none',
                     transition: 'background 0.18s',
@@ -284,9 +274,9 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
                   }}
                   title={type}
                 >
-                  {scripIcons[type] && (
+                  {tomeIcons[type] && (
                     <img
-                      src={scripIcons[type]}
+                      src={tomeIcons[type]}
                       alt={type}
                       style={{ width: 38, height: 38, borderRadius: 8, boxShadow: '0 1px 4px #e0e7ff', background: darkMode ? '#23232b' : '#fff' }}
                     />
@@ -330,7 +320,7 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
                 <tbody>
                   {sortedItems.map((item) => (
                     <tr
-                      key={item.itemId}
+                      key={item.itemId && item.itemId !== 0 ? item.itemId : item.name}
                       className={darkMode ? 'dark' : ''}
                       style={{cursor: 'pointer', fontSize: "0.98rem", height: "38px"}}
                       onClick={() => handleCalculatorOpen(item)}
@@ -353,7 +343,7 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
                       <td style={{textAlign: 'center', padding: "0.5rem 0.3rem"}}>{item.minPrice}</td>
                       <td style={{textAlign: 'center', padding: "0.5rem 0.3rem"}}>{item.weeklySales}</td>
                       <td style={{textAlign: 'center', padding: "0.5rem 0.3rem"}}>{item.qtyPerWeek}</td>
-                      <td style={{textAlign: 'center', color: darkMode ? '#a5b4fc' : '#6366f1', padding: "0.5rem 0.3rem"}}>{item.valuePerScrip ? item.valuePerScrip.toFixed(2) : "-"}</td>
+                      <td style={{textAlign: 'center', color: darkMode ? '#a5b4fc' : '#6366f1', padding: "0.5rem 0.3rem"}}>{item.valuePerTome ? item.valuePerTome.toFixed(2) : "-"}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -385,4 +375,4 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
   );
 };
 
-export default ScripExchange;
+export default TomeExchange;

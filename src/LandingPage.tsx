@@ -28,6 +28,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ darkMode, onToggleDarkMode })
                 Enter Scrip Exchange App
               </button>
             </a>
+            <a href="#/tome-exchange" style={{ textDecoration: 'none' }}>
+              <button className="landing-main-btn">
+                Enter Tome Exchange App
+              </button>
+            </a>
           </div>
         </div>
       </div>
