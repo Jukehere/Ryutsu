@@ -41,7 +41,7 @@ const ItemCalcModal: React.FC<ItemCalcModalProps> = ({ open, item, itemCount, ca
           />
         </div>
         <div style={{ fontWeight: 500, color: darkMode ? '#a5b4fc' : '#6366f1', marginBottom: 28, fontSize: '1.18rem', background: darkMode ? '#18181b' : '#eef2ff', borderRadius: 10, padding: '16px 0', width: '100%', textAlign: 'center', boxShadow: darkMode ? '0 1px 4px #18181b' : '0 1px 4px #e0e7ff' }}>
-          Scrips required: <b style={{ fontWeight: 700 }}>{item.cost * itemCount}</b>
+          Currency required: <b style={{ fontWeight: 700 }}>{item.cost * itemCount}</b>
         </div>
         <div style={{ fontWeight: 500, fontSize: '1.28rem', color: darkMode ? '#fff' : '#222', marginBottom: 28, background: darkMode ? '#23232b' : '#f3f4fa', borderRadius: 10, padding: '18px 0', width: '100%', textAlign: 'center', boxShadow: darkMode ? '0 1px 4px #18181b' : '0 1px 4px #e0e7ff' }}>
           Estimated Revenue: <span style={{ fontWeight: 700, color: '#22c55e', fontSize: '1.28rem' }}>{calcRevenue ? `${calcRevenue.toLocaleString(undefined, { maximumFractionDigits: 2 })} Gil` : '-'}</span>
