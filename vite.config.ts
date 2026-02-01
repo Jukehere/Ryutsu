@@ -6,4 +6,3 @@ export default defineConfig({
   base: '/Ryutsu/', // Set base for GitHub Pages
   plugins: [react()],
 });
-});
