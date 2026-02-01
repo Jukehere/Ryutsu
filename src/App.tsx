@@ -34,6 +34,7 @@ import type { ResultItem } from "./components/ResultsSection";
 import { ToastContext } from "./contexts/ToastContext";
 import ScripExchange from "./components/ScripExchange";
 import TomeExchange from "./components/TomeExchange";
+import CosmicExchange from "./components/CosmicExchange";
 
 type PathStep = {
   server: string;
@@ -306,6 +307,7 @@ const App: React.FC = () => {
           <Route path="/router" element={<RouterApp darkMode={darkMode} onToggleDarkMode={handleToggleDarkMode} />} />
           <Route path="/scrip-exchange" element={<ScripExchange darkMode={darkMode} onToggleDarkMode={handleToggleDarkMode} />} />
           <Route path="/tome-exchange" element={<TomeExchange darkMode={darkMode} onToggleDarkMode={handleToggleDarkMode} />} />
+          <Route path="/cosmic-exchange" element={<CosmicExchange darkMode={darkMode} onToggleDarkMode={handleToggleDarkMode} />} />
         </Routes>
       </Router>
     </ToastProvider>

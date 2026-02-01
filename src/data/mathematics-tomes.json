@@ -1,0 +1,20 @@
+[
+  { "name": "Airbright Coolant", "cost": 10 },
+  { "name": "Cronopio Skin", "cost": 10 },
+  { "name": "Diatryma Pelt", "cost": 10 },
+  { "name": "Dichromatic Compound", "cost": 10 },
+  { "name": "Double Duracoat", "cost": 20 },
+  { "name": "Everkeep Resin", "cost": 20 },
+  { "name": "Glossy Dried Ether", "cost": 10 },
+  { "name": "Hydrophobic Preservative", "cost": 10 },
+  { "name": "Insulating Varnish", "cost": 20 },
+  { "name": "Mastodon Pelt", "cost": 20 },
+  { "name": "Neo Abrasive", "cost": 10 },
+  { "name": "Pelupelu Yarn", "cost": 10 },
+  { "name": "Potsworn's Abrasive", "cost": 10 },
+  { "name": "Purussaurus Skin", "cost": 10 },
+  { "name": "Shaaloani Coke", "cost": 10 },
+  { "name": "Turali Pigment", "cost": 20 },
+  { "name": "Xbr'aal Varnish", "cost": 10 },
+  { "name": "Yollal Extract", "cost": 20 }
+]

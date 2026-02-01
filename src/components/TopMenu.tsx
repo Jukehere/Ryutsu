@@ -45,7 +45,7 @@ const TopMenu: React.FC<TopMenuProps> = ({
           </a>
         </div>
         <div className="app-title" style={{ flex: 0, display: 'flex', alignItems: 'center', gap: 12, fontSize: '1.2rem', fontWeight: 600, justifyContent: 'center', whiteSpace: 'nowrap' }}>
-          <span>Ryutsu v0.8</span>
+          <span>Ryutsu v0.9</span>
         </div>
         <div className="menu-controls" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 15 }}>
           <button

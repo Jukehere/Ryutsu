@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import mathematicsTomes from "../data/mathematics-tomes.json";
-import poeticsTomes from "../data/poetics-tomes.json";
+import cosmocreditList from "../data/cosmocredit.json";
+import phaennaTokenList from "../data/phaenna-token.json";
+import oizysTokenList from "../data/oizys-token.json";
+import cosmocreditIcon from "../assets/065112.png";
 import { fetcher, fetchMarketData } from "../api/api";
 
 interface UniversalisResponse {
@@ -13,12 +15,13 @@ import PurchaseHistoryModal from "./PurchaseHistoryModal";
 import ItemCalcModal from "./ItemCalcModal";
 import "../styles/ScripExchange.css";
 
-const TOME_TYPES = [
-  "Allagan Tomestone of Mathematics",
-  "Allagan Tomestone of Poetics"
+const CURRENCY_TYPES = [
+  "Cosmocredit",
+  "Phaenna Token",
+  "Oizys Token"
 ];
 
-interface TomeItem {
+interface CosmicItem {
   itemId: number;
   name: string;
   cost: number;
@@ -45,18 +48,18 @@ type MarketData = Record<number, MarketDataEntry>;
 
 const SORTABLE_COLUMNS = [
   { key: "name", label: "Item" },
-  { key: "cost", label: "Cost (Tomes)" },
+  { key: "cost", label: "Cost (Currency)" },
   { key: "minPrice", label: "Min Price" },
   { key: "weeklySales", label: "Weekly Sales" },
   { key: "qtyPerWeek", label: "Qty/Week" },
-  { key: "valuePerTome", label: "Value/Tome" }
+  { key: "valuePerCurrency", label: "Value/Currency" }
 ];
 
 const SERVER_LIST: string[] = [];
 
-const TomeExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void }> = ({ darkMode, onToggleDarkMode }) => {
-  const [tomeType, setTomeType] = useState<string>(TOME_TYPES[0]);
-  const [items, setItems] = useState<TomeItem[]>([]);
+const CosmicExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void }> = ({ darkMode, onToggleDarkMode }) => {
+  const [currencyType, setCurrencyType] = useState<string>(CURRENCY_TYPES[0]);
+  const [items, setItems] = useState<CosmicItem[]>([]);
   const [marketData, setMarketData] = useState<MarketData>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [datacenter, setDatacenter] = useState<string>(() => localStorage.getItem("ryutsu_dc") || "");
@@ -71,10 +74,11 @@ const TomeExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void }
   const handleSearchItems = () => {
     setLoading(true);
     const fileMap: Record<string, Array<{ name: string; cost: number }>> = {
-      "Allagan Tomestone of Mathematics": mathematicsTomes,
-      "Allagan Tomestone of Poetics": poeticsTomes
+      "Cosmocredit": cosmocreditList,
+      "Phaenna Token": phaennaTokenList,
+      "Oizys Token": oizysTokenList
     };
-    const loaded = fileMap[tomeType] || [];
+    const loaded = fileMap[currencyType] || [];
     Promise.all(
       loaded.map(async (item) => {
         const xivapi = await fetcher(item.name);
@@ -97,12 +101,6 @@ const TomeExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void }
   useEffect(() => {
     setDatacenter(localStorage.getItem("ryutsu_dc") || "");
   }, [setDatacenter]);
-  const handleCalculatorOpen = (item: typeof displayItems[0]) => {
-    setCalculatorItem(item);
-    setItemCount(1);
-    setCalcRevenue(item.minPrice ? item.minPrice : 0);
-    setCalcModalOpen(true);
-  };
 
   useEffect(() => {
     const handleStorage = () => {
@@ -157,10 +155,12 @@ const TomeExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void }
             console.error(`Failed to fetch history for items: ${batchItemIds}`);
           }
         }
+
         Object.entries(historyData).forEach(([itemId, entry]) => {
           if (!mergedMarketData[Number(itemId)]) mergedMarketData[Number(itemId)] = {};
           mergedMarketData[Number(itemId)].recentHistory = Array.isArray(entry.entries) ? entry.entries : [];
         });
+
         setMarketData(mergedMarketData);
       } catch {
         setMarketData({});
@@ -184,13 +184,13 @@ const TomeExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void }
       weeklySales = recent.length;
       qtyPerWeek = recent.reduce((sum: number, h: MarketHistory) => sum + h.quantity, 0);
     }
-    const valuePerTome = item.cost ? (minPrice / item.cost) : 0;
+    const valuePerCurrency = item.cost ? (minPrice / item.cost) : 0;
     return {
       ...item,
       minPrice,
       weeklySales,
       qtyPerWeek,
-      valuePerTome
+      valuePerCurrency
     };
   });
 
@@ -222,6 +222,13 @@ const TomeExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void }
     setPriceListModal({ open: true, itemId: item.itemId, itemName: item.name, datacenter });
   };
 
+  const handleCalculatorOpen = (item: typeof displayItems[0]) => {
+    setCalculatorItem(item);
+    setItemCount(1);
+    setCalcRevenue(item.minPrice ? item.minPrice : 0);
+    setCalcModalOpen(true);
+  };
+
   const handleCalculatorClose = () => {
     setCalculatorItem(null);
     setItemCount(1);
@@ -238,10 +245,11 @@ const TomeExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void }
       setCalcRevenue(0);
     }
   };
-
-  const tomeIcons: Record<string, string> = {
-    "Allagan Tomestone of Mathematics": "https://xivapi.com/i/065000/065122.png",
-    "Allagan Tomestone of Poetics": "https://xivapi.com/i/065000/065023.png"
+  
+  const cosmicIcons: Record<string, string> = {
+    "Cosmocredit": cosmocreditIcon,
+    "Phaenna Token": "https://xivapi.com/i/026000/026177.png",
+    "Oizys Token": "https://xivapi.com/i/026000/026177.png"
   };
 
   return (
@@ -249,19 +257,19 @@ const TomeExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void }
       <TopMenu darkMode={darkMode} onToggleDarkMode={onToggleDarkMode} onOpenSidebar={() => {}} />
       <div className={`root app-root-with-header${darkMode ? ' dark' : ''}`}> 
         <div className={`card${darkMode ? ' dark' : ''}`}> 
-          <h2 className={`title${darkMode ? ' dark' : ''}`}>Tome Exchange</h2>
+          <h2 className={`title${darkMode ? ' dark' : ''}`}>Cosmic Exchange</h2>
           <div className="controls" style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: 18 }}>
             <div style={{ display: 'flex', gap: 14 }}>
-              {TOME_TYPES.map(type => (
+              {CURRENCY_TYPES.map(type => (
                 <button
                   key={type}
-                  onClick={() => setTomeType(type)}
+                  onClick={() => setCurrencyType(type)}
                   style={{
-                    background: tomeType === type ? (darkMode ? '#6366f1' : '#6366f1') : (darkMode ? '#23232b' : '#fff'),
-                    border: tomeType === type ? '2px solid #a5b4fc' : '2px solid #c7d2fe',
+                    background: currencyType === type ? (darkMode ? '#6366f1' : '#6366f1') : (darkMode ? '#23232b' : '#fff'),
+                    border: currencyType === type ? '2px solid #a5b4fc' : '2px solid #c7d2fe',
                     borderRadius: 12,
                     padding: '8px',
-                    boxShadow: tomeType === type ? '0 2px 8px #6366f1' : '0 1px 4px #e0e7ff',
+                    boxShadow: currencyType === type ? '0 2px 8px #6366f1' : '0 1px 4px #e0e7ff',
                     cursor: 'pointer',
                     outline: 'none',
                     transition: 'background 0.18s',
@@ -273,9 +281,9 @@ const TomeExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void }
                   }}
                   title={type}
                 >
-                  {tomeIcons[type] && (
+                  {cosmicIcons[type] && (
                     <img
-                      src={tomeIcons[type]}
+                      src={cosmicIcons[type]}
                       alt={type}
                       style={{ width: 38, height: 38, borderRadius: 8, boxShadow: '0 1px 4px #e0e7ff', background: darkMode ? '#23232b' : '#fff' }}
                     />
@@ -319,7 +327,7 @@ const TomeExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void }
                 <tbody>
                   {sortedItems.map((item) => (
                     <tr
-                      key={item.itemId && item.itemId !== 0 ? item.itemId : item.name}
+                      key={item.itemId}
                       className={darkMode ? 'dark' : ''}
                       style={{cursor: 'pointer', fontSize: "0.98rem", height: "38px"}}
                       onClick={() => handleCalculatorOpen(item)}
@@ -342,7 +350,7 @@ const TomeExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void }
                       <td style={{textAlign: 'center', padding: "0.5rem 0.3rem"}}>{item.minPrice}</td>
                       <td style={{textAlign: 'center', padding: "0.5rem 0.3rem"}}>{item.weeklySales}</td>
                       <td style={{textAlign: 'center', padding: "0.5rem 0.3rem"}}>{item.qtyPerWeek}</td>
-                      <td style={{textAlign: 'center', color: darkMode ? '#a5b4fc' : '#6366f1', padding: "0.5rem 0.3rem"}}>{item.valuePerTome ? item.valuePerTome.toFixed(2) : "-"}</td>
+                      <td style={{textAlign: 'center', color: darkMode ? '#a5b4fc' : '#6366f1', padding: "0.5rem 0.3rem"}}>{item.valuePerCurrency ? item.valuePerCurrency.toFixed(2) : "-"}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -374,4 +382,4 @@ const TomeExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void }
   );
 };
 
-export default TomeExchange;
+export default CosmicExchange;
