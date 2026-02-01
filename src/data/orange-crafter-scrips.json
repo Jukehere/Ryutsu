@@ -1,0 +1,18 @@
+[
+  { "name": "Aji Amarillo", "cost": 15 },
+  { "name": "Brown Cardamom", "cost": 10 },
+  { "name": "Cassava", "cost": 15 },
+  { "name": "Condensed Solution", "cost": 125 },
+  { "name": "Hingan Rock Garden", "cost": 1000 },
+  { "name": "Navel Orange", "cost": 10 },
+  { "name": "Queso Fresco", "cost": 15 },
+  { "name": "Royal Lobster", "cost": 10 },
+  { "name": "Rumpless Chicken", "cost": 10 },
+  { "name": "Splendid Mate Leaves", "cost": 15 },
+  { "name": "Sweet Dreamer's Stall", "cost": 500 },
+  { "name": "Wild Coffee Beans", "cost": 10 },
+  { "name": "Woolback Loin", "cost": 15 },
+  { "name": "Craftsman's Command Materia XII", "cost": 500 },
+  { "name": "Craftsman's Competence Materia XII", "cost": 500 },
+  { "name": "Craftsman's Cunning Materia XII", "cost": 500 }
+]

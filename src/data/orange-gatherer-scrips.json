@@ -1,0 +1,14 @@
+[
+  { "name": "Gatherer's Grasp Materia XII", "cost": 500 },
+  { "name": "Gatherer's Guerdon Materia XII", "cost": 500 },
+  { "name": "Gatherer's Guile Materia XII", "cost": 500 },
+  { "name": "Botanist's Wall Frames", "cost": 500 },
+  { "name": "Ghost Nipper", "cost": 5 },
+  { "name": "Mount Token", "cost": 1000 },
+  { "name": "Mythbrine Aethersand", "cost": 200 },
+  { "name": "Mythloam Aethersand", "cost": 200 },
+  { "name": "Mythroot Aethersand", "cost": 200 },
+  { "name": "Red Maggots", "cost": 5 },
+  { "name": "Sungilt Aethersand", "cost": 100 },
+  { "name": "Levinchrome Aethersand", "cost": 300 }
+]

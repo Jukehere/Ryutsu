@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ryutsu 0.5</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="light-mode">
+    <div class="top-menu">
+      <button id="lists-btn" class="lists-btn-prominent" title="Manage Lists">
+        <i class="fas fa-list-ul"></i>
+        <span class="lists-btn-label">Lists</span>
+      </button>
+      <div class="app-title">
+        <span>Ryutsu v0.5</span>
+      </div>
+      <div class="menu-controls">
+        <button id="help-btn" class="menu-btn" title="Help">
+          <i class="fas fa-question-circle"></i> Help
+        </button>
+        <a
+          href="https://github.com/Jukehere/Ryutsu"
+          target="_blank"
+          class="menu-btn"
+          title="GitHub"
+          style="
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.25rem;
+          "
+        >
+          <i class="fab fa-github"></i>
+        </a>
+        <button
+          id="mode-toggle"
+          class="menu-btn"
+          title="Toggle dark/light mode"
+        >
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
+    </div>
+    <div id="lists-sidebar" class="lists-sidebar">
+      <div class="lists-sidebar-header">
+        <span
+          style="
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+          "
+        >
+          <i class="fas fa-list-ul"></i> Lists
+        </span>
+        <button
+          id="close-lists-sidebar"
+          class="sidebar-close-btn"
+          title="Close"
+        >
+          &times;
+        </button>
+      </div>
+      <div class="lists-sidebar-content">
+        <div class="sidebar-section">
+          <input
+            id="sidebar-list-name"
+            type="text"
+            placeholder="List name..."
+            class="sidebar-input"
+          />
+          <button
+            id="sidebar-save-list-btn"
+            class="btn btn-secondary"
+            style="width: 100%; margin-top: 8px"
+          >
+            <i class="fas fa-save"></i> Save Current
+          </button>
+        </div>
+        <div class="sidebar-section" style="margin-top: 18px">
+          <div
+            style="
+              font-weight: 600;
+              margin-bottom: 8px;
+              font-size: 1rem;
+              display: flex;
+              align-items: center;
+              gap: 6px;
+            "
+          >
+            <i class="fas fa-folder-open"></i> Saved Lists
+          </div>
+          <ul id="sidebar-lists-list" class="sidebar-lists-list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <section class="input-section">
+        <div class="input-group">
+          <label for="items-input">
+            <i class="fas fa-clipboard-list"></i> Paste your items list
+          </label>
+          <textarea
+            id="items-input"
+            placeholder="Paste your items here. Example:
+4x Claro Walnut Lumber
+1x Titanium Gold Nugget
+5x Ra'Kaznar Ingot"
+          ></textarea>
+        </div>
+
+        <div class="input-row">
+          <div class="input-group">
+            <label for="datacenter">
+              <i class="fas fa-server"></i> Data Center
+            </label>
+            <select id="datacenter">
+              <option value="" selected>-- Select Data Center --</option>
+              <option value="Elemental">Elemental (JP)</option>
+              <option value="Gaia">Gaia (JP)</option>
+              <option value="Mana">Mana (JP)</option>
+              <option value="Meteor">Meteor (JP)</option>
+              <option value="Aether">Aether (NA)</option>
+              <option value="Primal">Primal (NA)</option>
+              <option value="Crystal">Crystal (NA)</option>
+              <option value="Dynamis">Dynamis (NA)</option>
+              <option value="Chaos">Chaos (EU)</option>
+              <option value="Light">Light (EU)</option>
+              <option value="Materia">Materia (OCE)</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="hq-switch">
+              <i class="fas fa-gem"></i> Item Quality
+            </label>
+            <div class="quality-toggle">
+              <button id="nq-btn" type="button" class="quality-btn active">
+                NQ
+              </button>
+              <button id="hq-btn" type="button" class="quality-btn">HQ</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button id="search-btn" class="btn btn-primary">
+            <i class="fas fa-search"></i> Search Prices
+          </button>
+        </div>
+        <div
+          id="toast-container"
+          style="
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+          "
+        ></div>
+      </section>
+
+      <section class="results-section">
+        <div class="section-header">
+          <h2><i class="fas fa-list"></i> Shopping List</h2>
+          <div class="results-info" id="results-info">
+            Enter your items and click Search Prices
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table id="results-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th class="quantity-cell">Qty</th>
+                <th class="server-cell">Server</th>
+                <th class="price-cell">Price</th>
+              </tr>
+            </thead>
+            <tbody id="results-body"></tbody>
+          </table>
+        </div>
+        <div class="button-group" id="path-btn-group" style="margin-top: 18px">
+          <button id="path-btn" class="btn btn-secondary" disabled>
+            <i class="fas fa-route"></i> Find Path
+          </button>
+        </div>
+      </section>
+
+      <section class="path-section" id="path-section" style="display: none">
+        <div class="section-header">
+          <h2><i class="fas fa-route"></i> Optimal Shopping Path</h2>
+        </div>
+
+        <div class="path-steps" id="path-steps"></div>
+
+        <div class="total-row" id="total-cost">Total Estimated Cost: 0 Gil</div>
+        <div class="savings-row" id="total-savings">
+          Estimated Savings: 0 Gil
+        </div>
+      </section>
+
+      <footer>
+        <p>
+          Ryutsu v0.5 • Not Associated with Square Enix<br />
+          Prices from
+          <a href="https://universalis.app/" target="_blank">Universalis.app</a>
+          • Item data from
+          <a href="https://xivapi.com/" target="_blank">XIVAPI</a>
+        </p>
+        <p>
+          Made by <a href="https://github.com/Jukehere" target="_blank">Juke</a>
+        </p>
+      </footer>
+    </div>
+
+    <script src="main.js"></script>
+    <style>
+      .help-section {
+        margin-top: 10px;
+      }
+      .help-topic {
+        border-radius: 7px;
+        background: #f8fafc;
+        margin-bottom: 10px;
+        box-shadow: 0 1px 2px rgba(99, 102, 241, 0.04);
+        border: 1px solid #eaeaea;
+        transition: background 0.2s;
+        outline: none;
+      }
+      body.dark-mode .help-topic {
+        background: #18181b;
+        border-color: #222;
+      }
+      .help-topic-header {
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1.05rem;
+        padding: 12px 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        user-select: none;
+        transition: background 0.18s;
+      }
+      .help-topic-header:hover,
+      .help-topic:focus .help-topic-header {
+        background: #eef2ff;
+      }
+      body.dark-mode .help-topic-header:hover,
+      body.dark-mode .help-topic:focus .help-topic-header {
+        background: #222;
+      }
+      .help-topic-content {
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 0 14px;
+        font-size: 0.97rem;
+        color: #444;
+      }
+      body.dark-mode .help-topic-content {
+        color: #d4d4d8;
+      }
+      .help-topic.expanded .help-topic-content {
+        padding: 10px 14px 14px 14px;
+      }
+      .help-topic.expanded .help-topic-header {
+        background: #eef2ff;
+      }
+      body.dark-mode .help-topic.expanded .help-topic-header {
+        background: #222;
+      }
+      .help-topic-header i {
+        transition: transform 0.18s;
+        font-size: 1.1em;
+      }
+    </style>
+  </body>
+</html>
