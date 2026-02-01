@@ -83,7 +83,7 @@ const ScripExchange: React.FC<{ darkMode: boolean; onToggleDarkMode: () => void 
     const loaded = fileMap[scripType] || [];
     Promise.all(
       loaded.map(async (item) => {
-        const xivapi = await fetchItemIdAndIconFromXIVAPI(item.name);
+        const xivapi = await fetcher(item.name);
         return {
           itemId: xivapi.id ?? 0,
           name: xivapi.canonicalName ?? item.name,
