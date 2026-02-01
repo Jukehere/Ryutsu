@@ -13,7 +13,6 @@ type RouterAppProps = {
 import TopMenu from "./components/TopMenu";
 import Sidebar from "./components/Sidebar";
 import SearchPrices from "./components/SearchPrices";
-// Duplicate REGION_MAP for region logic
 const REGION_MAP: Record<string, string> = {
   "Aether": "America",
   "Primal": "America",
@@ -62,12 +61,10 @@ const RouterApp: React.FC<RouterAppProps> = ({ darkMode, onToggleDarkMode }) => 
   const [priceListModal, setPriceListModal] = useState<{ open: boolean; itemId?: number; itemName: string; datacenter: string; crossDCMode?: boolean }>({ open: false, itemId: undefined, itemName: "", datacenter: "", crossDCMode: false });
 
   useEffect(() => {
-    // FontAwesome is injected at the top level
     document.body.className = darkMode ? "dark-mode" : "light-mode";
     localStorage.setItem("ryutsu-dark-mode", darkMode ? "true" : "false");
   }, [darkMode]);
 
-  // Handler for Find Path button (real logic)
   const handleFindPath = () => {
     if (results.length === 0) return;
     const itemsByServer: {
